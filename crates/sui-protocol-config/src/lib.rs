@@ -1700,7 +1700,6 @@ impl ProtocolConfig {
                     // Add costs for poseidon::poseidon_bn254
                     cfg.poseidon_bn254_cost_base = Some(260);
                     cfg.poseidon_bn254_cost_per_block = Some(10);
-
                 }
                 // Use this template when making changes:
                 //
