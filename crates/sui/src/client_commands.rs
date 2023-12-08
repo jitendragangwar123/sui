@@ -339,6 +339,7 @@ pub enum SuiClientCommands {
     /// Pay SUI coins to recipients following following specified amounts, with input coins.
     /// Length of recipients must be the same as that of amounts.
     /// The input coins also include the coin for gas payment, so no extra gas coin is required.
+    #[clap(name = "test")]
     PaySui {
         /// The input coins to be used for pay recipients, including the gas coin.
         #[clap(long, num_args(1..))]
@@ -365,6 +366,13 @@ pub enum SuiClientCommands {
         /// (SenderSignedData) using base64 encoding, and print out the string.
         #[clap(long, required = false)]
         serialize_signed_transaction: bool,
+    },
+
+    /// Run a PTB either from file or from the provided args
+    PTB {
+        file: Option<String>,
+        #[clap(long, num_args(1..))]
+        input: Option<Vec<String>>,
     },
 
     /// Publish Move modules
@@ -1345,6 +1353,11 @@ impl SuiClientCommands {
                     .await?;
 
                 SuiClientCommandResult::VerifySource
+            }
+            SuiClientCommands::PTB { file, input } => {
+                println!("{:?}", file);
+                println!("{:?}", input);
+                SuiClientCommandResult::RawObject(SuiObjectResponse::new(None, None))
             }
         });
         ret
