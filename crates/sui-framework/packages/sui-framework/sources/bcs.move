@@ -132,6 +132,20 @@ module sui::bcs {
         value
     }
 
+    /// Read `u256` value from bcs-serialized bytes.
+    public fun peel_u256(bcs: &mut BCS): u256 {
+        assert!(v::length(&bcs.bytes) >= 32, EOutOfRange);
+
+        let (value, i) = (0u256, 0u16);
+        while (i < 256) {
+            let byte = (v::pop_back(&mut bcs.bytes) as u256);
+            value = value + (byte << (i as u8));
+            i = i + 8;
+        };
+
+        value
+    }
+
     // === Vector<T> ===
 
     /// Read ULEB bytes expecting a vector length. Result should
@@ -214,6 +228,16 @@ module sui::bcs {
         res
     }
 
+    /// Peel a vector of `u256` from serialized bytes.
+    public fun peel_vec_u256(bcs: &mut BCS): vector<u256> {
+        let (len, i, res) = (peel_vec_length(bcs), 0, vector[]);
+        while (i < len) {
+            v::push_back(&mut res, peel_u256(bcs));
+            i = i + 1;
+        };
+        res
+    }
+
     // === Option<T> ===
 
     /// Peel `Option<address>` from serialized bytes.
@@ -256,6 +280,15 @@ module sui::bcs {
     public fun peel_option_u128(bcs: &mut BCS): Option<u128> {
         if (peel_bool(bcs)) {
             option::some(peel_u128(bcs))
+        } else {
+            option::none()
+        }
+    }
+
+    /// Peel `Option<u256>` from serialized bytes.
+    public fun peel_option_u256(bcs: &mut BCS): Option<u256> {
+        if (peel_bool(bcs)) {
+            option::some(peel_u256(bcs))
         } else {
             option::none()
         }
@@ -309,6 +342,12 @@ module sui::bcs {
             let value = option::some(10000999999u128);
             let bytes = new(to_bytes(&value));
             assert!(value == peel_option_u128(&mut bytes), 0);
+        };
+
+        {
+            let value = option::some(100009999990000999999u256);
+            let bytes = new(to_bytes(&value));
+            assert!(value == peel_option_u256(&mut bytes), 0);
         };
 
         {
@@ -366,6 +405,12 @@ module sui::bcs {
             let value = 100000000000000000000000000u128;
             let bytes = new(to_bytes(&value));
             assert!(value == peel_u128(&mut bytes), 0);
+        };
+
+        { // u256 (32 bytes)
+            let value = 10000000000000000000000000000000000000000000000000000u256;
+            let bytes = new(to_bytes(&value));
+            assert!(value == peel_u256(&mut bytes), 0);
         };
 
         { // vector length
