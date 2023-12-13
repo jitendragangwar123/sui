@@ -370,21 +370,33 @@ pub enum SuiClientCommands {
 
     /// Run a PTB either from file or from the provided args
     PTB {
+        /// The path to the file containing the PTBs
         file: Option<String>,
-        #[clap(long, num_args(2), value_terminator(";"))]
+        /// An input for the PTB, defined as the variable name and value. E.g., --input recipient 0x321...1231
+        #[clap(long, num_args(2))]
         input: Option<Vec<String>>,
+        /// The object ID of the gas coin
         #[clap(long)]
         gas: String,
+        /// The gas budget to be used to execute this PTB
         #[clap(long)]
         gas_budget: u64,
+        /// Given n-values of the same type, it constructs a vector.
+        /// For non objects or an empty vector, the type tag must be specified.
         #[clap(long, num_args(2..))]
         make_move_vec: Option<Vec<String>>,
-        #[clap(long, num_args(2..))]
+        /// Merge N coins into the provided coin. E.g., merge-coins into_coin vector[coin1,coin2,coin3]
+        #[clap(long, num_args(2))]
         merge_coins: Option<Vec<String>>,
+        /// Make a move call to a function
         #[clap(long, num_args(2..))]
         move_call: Option<Vec<String>>,
-        #[clap(long, num_args(2..4))]
+        /// Split the coin into N coins as per the given amount. Bind the output to result.
+        /// E.g., --split-coins result=new_coins coin_to_split vector[amount].
+        /// On zsh, the vector needs to be given in quotes ("vector[amount,amount2]")
+        #[clap(long, num_args(2..5))]
         split_coins: Option<Vec<String>>,
+        /// Transfer objects to the address. E.g., --transfer-objects to_address vector[obj]
         #[clap(long, num_args(2..4))]
         transfer_objects: Option<Vec<String>>,
         /// Publish the move package. It takes as input the folder where the package exists.
@@ -1389,9 +1401,13 @@ impl SuiClientCommands {
                 transfer_objects,
                 publish,
                 upgrade,
+                preview,
             } => {
-                println!("{:?}", file);
-                println!("{:?}", input);
+                println!("File {:?}", file);
+                println!("Input: {:?}", input);
+                println!("Merge coins: {:?}", merge_coins);
+                println!("Split coins: {:?}", split_coins);
+                println!("{:?}", make_move_vec);
                 SuiClientCommandResult::RawObject(SuiObjectResponse::new(None, None))
             }
         });
