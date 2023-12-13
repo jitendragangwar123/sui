@@ -393,6 +393,9 @@ pub enum SuiClientCommands {
         /// Upgrade the move package. It takes as input the folder where the package exists.
         #[clap(long)]
         upgrade: Option<String>,
+        /// Preview the PTB instead of executing it
+        #[clap(long)]
+        preview: bool,
     },
 
     /// Publish Move modules
