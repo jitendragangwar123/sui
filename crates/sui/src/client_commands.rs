@@ -371,8 +371,28 @@ pub enum SuiClientCommands {
     /// Run a PTB either from file or from the provided args
     PTB {
         file: Option<String>,
-        #[clap(long, num_args(1..))]
+        #[clap(long, num_args(2), value_terminator(";"))]
         input: Option<Vec<String>>,
+        #[clap(long)]
+        gas: String,
+        #[clap(long)]
+        gas_budget: u64,
+        #[clap(long, num_args(2..))]
+        make_move_vec: Option<Vec<String>>,
+        #[clap(long, num_args(2..))]
+        merge_coins: Option<Vec<String>>,
+        #[clap(long, num_args(2..))]
+        move_call: Option<Vec<String>>,
+        #[clap(long, num_args(2..4))]
+        split_coins: Option<Vec<String>>,
+        #[clap(long, num_args(2..4))]
+        transfer_objects: Option<Vec<String>>,
+        /// Publish the move package. It takes as input the folder where the package exists.
+        #[clap(long)]
+        publish: Option<String>,
+        /// Upgrade the move package. It takes as input the folder where the package exists.
+        #[clap(long)]
+        upgrade: Option<String>,
     },
 
     /// Publish Move modules
@@ -1354,7 +1374,19 @@ impl SuiClientCommands {
 
                 SuiClientCommandResult::VerifySource
             }
-            SuiClientCommands::PTB { file, input } => {
+            SuiClientCommands::PTB {
+                file,
+                input,
+                gas,
+                gas_budget,
+                make_move_vec,
+                merge_coins,
+                move_call,
+                split_coins,
+                transfer_objects,
+                publish,
+                upgrade,
+            } => {
                 println!("{:?}", file);
                 println!("{:?}", input);
                 SuiClientCommandResult::RawObject(SuiObjectResponse::new(None, None))
