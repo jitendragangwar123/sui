@@ -14,12 +14,13 @@ use crate::{
         AbilitySet, AttributeName_, AttributeValue_, Attribute_, Attributes, Fields, Friend,
         ModuleAccess_, ModuleIdent, ModuleIdent_, Value_, Visibility,
     },
-    naming::ast::{self as N, BlockLabel, TParam, TParamID, Type, TypeName_, Type_},
     naming::ast::DatatypeTypeParameter,
+    naming::ast::{self as N, BlockLabel, TParam, TParamID, Type, TypeName_, Type_},
     parser::ast::{
         Ability_, BinOp_, ConstantName, DatatypeName, Field, FunctionName, UnaryOp_, VariantName,
     },
     shared::{
+        ast_debug::AstDebug,
         known_attributes::{KnownAttribute, TestingAttribute},
         program_info::{DatatypeKind, TypingProgramInfo},
         unique_map::UniqueMap,
@@ -195,7 +196,7 @@ fn function(context: &mut Context, name: FunctionName, f: N::Function) -> T::Fun
         };
     function_signature(context, &signature);
     expand::function_signature(context, &mut signature);
-
+    println!("fn: {name}");
     let body = function_body(context, n_body);
     unused_let_muts(context);
     context.current_function = None;
@@ -232,6 +233,7 @@ fn function_body(context: &mut Context, sp!(loc, nb_): N::FunctionBody) -> T::Fu
     let mut b_ = match nb_ {
         N::FunctionBody_::Native => T::FunctionBody_::Native,
         N::FunctionBody_::Defined(es) => {
+            es.print_verbose();
             let seq = sequence(context, es);
             let ety = sequence_type(&seq);
             let ret_ty = context.return_type.clone().unwrap();
@@ -2298,7 +2300,7 @@ fn resolve_field(context: &mut Context, loc: Loc, ty: Type, field: &Field) -> Ty
             ));
             context.error_type(loc)
         }
-        sp!(_, Apply(_, sp!(_, ModuleType(m, n)), _targs)) => {
+        sp!(_, Apply(_, sp!(_, ModuleType(m, n)), targs)) => {
             if !context.is_current_module(&m) {
                 let msg = format!(
                     "Invalid access of field '{}' on '{}::{}'. Fields can only be accessed inside \
@@ -2309,17 +2311,22 @@ fn resolve_field(context: &mut Context, loc: Loc, ty: Type, field: &Field) -> Ty
                     .env
                     .add_diag(diag!(TypeSafety::Visibility, (loc, msg)));
             }
-            if !(context.datatype_kind(&m, &n) == DatatypeKind::Struct) {
-                let msg = format!(
-                    "Invalid access of field '{}' on '{}::{}'. Fields can only be accessed on \
-                     structs, not enums",
-                    field, &m, &n
-                );
-                context
-                    .env
-                    .add_diag(diag!(TypeSafety::ExpectedSpecificType, (loc, msg)));
+            match context.datatype_kind(&m, &n) {
+                DatatypeKind::Struct => {
+                    core::make_struct_field_type(context, loc, &m, &n, targs, field)
+                }
+                DatatypeKind::Enum => {
+                    let msg = format!(
+                        "Invalid access of field '{}' on '{}::{}'. Fields can only be accessed on \
+                         structs, not enums",
+                        field, &m, &n
+                    );
+                    context
+                        .env
+                        .add_diag(diag!(TypeSafety::ExpectedSpecificType, (loc, msg)));
+                    context.error_type(loc)
+                }
             }
-            context.error_type(loc)
         }
         t => {
             let smsg = format!(

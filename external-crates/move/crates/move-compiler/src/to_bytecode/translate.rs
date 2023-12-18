@@ -1111,12 +1111,7 @@ fn exp(context: &mut Context, code: &mut IR::BytecodeBlock, e: H::Exp) {
         }
 
         E::PackVariant(e, v, tys, field_args) if field_args.is_empty() => {
-            // empty fields are not allowed in the bytecode, add a dummy field
-            // empty structs have a dummy field of type 'bool' added
-
-            // Push on fake field
-            code.push(sp(loc, B::LdFalse));
-
+            // unlike structs, empty fields _are_ allowed in the bytecode
             let e = context.enum_definition_name(context.current_module().unwrap(), e);
             let v = context.variant_name(v);
             code.push(sp(loc, B::PackVariant(e, v, base_types(context, tys))))

@@ -114,6 +114,7 @@ struct VariantConstructor {
     original_variant_name: Name,
     decl_loc: Loc,
     is_positional: bool,
+    is_empty: bool,
 }
 
 enum ResolvedFunction {
@@ -206,6 +207,10 @@ impl<'env> Context<'env> {
                                     is_positional: matches!(
                                         v.fields,
                                         E::VariantFields::Positional(_)
+                                    ),
+                                    is_empty: matches!(
+                                        v.fields,
+                                        E::VariantFields::Empty
                                     ),
                                 });
                             let type_info = ModuleType::Enum(EnumType {
@@ -621,7 +626,8 @@ impl<'env> Context<'env> {
         VariantName,
         Option<Vec<N::Type>>,
         Loc,
-        bool,
+        /* is_positional */ bool,
+        /* is_empty */ bool,
     )> {
         match &ma {
             sp!(_, E::ModuleAccess_::Variant(sp!(_, _), variant_name)) => {
@@ -636,6 +642,7 @@ impl<'env> Context<'env> {
                             ty_opts,
                             vdef.decl_loc,
                             vdef.is_positional,
+                            vdef.is_empty
                         ))
                     } else {
                         let primary_msg = format!(
@@ -1651,6 +1658,37 @@ fn exp_(context: &mut Context, e: E::Exp) -> N::Exp {
             }
             Some(nv) => NE::Copy(nv),
         },
+        EE::Name(ma @ sp!(_, E::ModuleAccess_::Variant(_, _)), etys_opt) => {
+            context
+                .env
+                .check_feature(FeatureGate::Enums, context.current_package, eloc);
+            match context.resolve_variant_name(eloc, "construction", ma, etys_opt) {
+                None => {
+                    assert!(context.env.has_errors());
+                    NE::UnresolvedError
+                }
+                Some((m, en, vn, tys_opt, dloc, is_positional, is_empty)) => {
+                    if !is_empty {
+                        let msg = "Invalid variant instantiation. Non-empty variant instantiations \
+                                   require arguments";
+                        let defn_msg = "Variant is defined here.";
+                        let mut diag = diag!(
+                            NameResolution::PositionalCallMismatch,
+                            (eloc, msg),
+                            (dloc, defn_msg)
+                        );
+                        if is_positional {
+                            diag.add_note("Pass arguments to positional variants using '()'");
+                        } else {
+                            diag.add_note("Pass arguments to named variant fields using '{ .. }'");
+                        }
+                        context.env.add_diag(diag);
+                    }
+
+                    NE::PackVariant(m, en, vn, tys_opt, UniqueMap::new())
+                }
+            }
+        }
         EE::Name(sp!(aloc, E::ModuleAccess_::Name(v)), None) => {
             if is_constant_name(&v.value) {
                 access_constant(context, sp(aloc, E::ModuleAccess_::Name(v)))
@@ -1796,10 +1834,21 @@ fn exp_(context: &mut Context, e: E::Exp) -> N::Exp {
                     assert!(context.env.has_errors());
                     NE::UnresolvedError
                 }
-                Some((m, en, vn, tys_opt, dloc, is_positional)) => {
-                    if is_positional {
-                        let msg = "Invalid variant instantiation. Named variant declarations \
-                                   require named instantiations.";
+                Some((m, en, vn, tys_opt, dloc, is_positional, is_empty)) => {
+                    if is_empty {
+                        let msg = "Invalid variant instantiation. Empty variant instantiations \
+                                   do not use field syntax";
+                        let defn_msg = "Variant is defined here.";
+                        let mut diag = diag!(
+                            NameResolution::PositionalCallMismatch,
+                            (eloc, msg),
+                            (dloc, defn_msg)
+                        );
+                        diag.add_note("Remove '{}' after the variant name");
+                        context.env.add_diag(diag);
+                    } else if is_positional {
+                        let msg = "Invalid variant instantiation. Positional variant fields \
+                                   require positional instantiations.";
                         let defn_msg = "Variant is defined here.";
                         context.env.add_diag(diag!(
                             NameResolution::PositionalCallMismatch,
@@ -1807,6 +1856,7 @@ fn exp_(context: &mut Context, e: E::Exp) -> N::Exp {
                             (dloc, defn_msg)
                         ));
                     }
+
                     NE::PackVariant(m, en, vn, tys_opt, fields)
                 }
             }
@@ -1922,9 +1972,20 @@ fn exp_(context: &mut Context, e: E::Exp) -> N::Exp {
                     assert!(context.env.has_errors());
                     NE::UnresolvedError
                 }
-                Some((m, en, vn, tys_opt, dloc, is_positional)) => {
-                    if !is_positional {
-                        let msg = "Invalid variant instantiation. Named variant declarations \
+                Some((m, en, vn, tys_opt, dloc, is_positional, is_empty)) => {
+                    if is_empty {
+                        let msg = "Invalid variant instantiation. Empty variant instantiations \
+                                   do not use call syntax";
+                        let defn_msg = "Variant is defined here.";
+                        let mut diag = diag!(
+                            NameResolution::PositionalCallMismatch,
+                            (eloc, msg),
+                            (dloc, defn_msg)
+                        );
+                        diag.add_note("Remove '()' after the variant name");
+                        context.env.add_diag(diag);
+                    } else if !is_positional {
+                        let msg = "Invalid variant instantiation. Named variant fields \
                                    require named instantiations.";
                         let defn_msg = "Variant is defined here.";
                         context.env.add_diag(diag!(
@@ -1933,6 +1994,7 @@ fn exp_(context: &mut Context, e: E::Exp) -> N::Exp {
                             (dloc, defn_msg)
                         ));
                     }
+
                     NE::PackVariant(
                         m,
                         en,
@@ -2097,11 +2159,11 @@ fn pat(context: &mut Context, sp!(ploc, pat_): E::MatchPattern) -> N::MatchPatte
         context: &mut Context,
         loc: Loc,
         name: E::ModuleAccess,
-    ) -> Option<(ModuleIdent, DatatypeName, VariantName, bool)> {
-        if let Some((mident, enum_name, variant, _, _, is_positional)) =
+    ) -> Option<(ModuleIdent, DatatypeName, VariantName, bool, bool)> {
+        if let Some((mident, enum_name, variant, _, _, is_positional, is_empty)) =
             context.resolve_variant_name(loc, "pattern", name, None)
         {
-            Some((mident, enum_name, variant, is_positional))
+            Some((mident, enum_name, variant, is_positional, is_empty))
         } else {
             None
         }
@@ -2109,16 +2171,23 @@ fn pat(context: &mut Context, sp!(ploc, pat_): E::MatchPattern) -> N::MatchPatte
 
     let pat_: N::MatchPattern_ = match pat_ {
         EP::PositionalConstructor(name, args) => {
-            if let Some((mident, enum_, variant, is_positional)) =
+            if let Some((mident, enum_, variant, is_positional, is_empty)) =
                 ctor_pat_name(context, ploc, name)
             {
-                if !is_positional {
+                if is_empty {
+                    let msg = "Invalid variant pattern. Empty variants \
+                               are not matched with positional variant syntax";
+                    let mut diag = diag!(NameResolution::PositionalCallMismatch, (ploc, msg));
+                    diag.add_note("Remove '()' after the variant name");
+                    context.env.add_diag(diag);
+                } else if !is_positional {
                     let msg = "Invalid variant pattern. Named variant declarations \
                                    require named patterns.";
                     context
                         .env
                         .add_diag(diag!(NameResolution::PositionalCallMismatch, (ploc, msg)));
                 }
+
                 let args = UniqueMap::maybe_from_iter(args.value.into_iter().enumerate().map(
                     |(idx, p)| {
                         let field = Field::add_loc(p.loc, format!("{idx}").into());
@@ -2133,16 +2202,23 @@ fn pat(context: &mut Context, sp!(ploc, pat_): E::MatchPattern) -> N::MatchPatte
             }
         }
         EP::FieldConstructor(name, args) => {
-            if let Some((mident, enum_, variant, is_positional)) =
+            if let Some((mident, enum_, variant, is_positional, is_empty)) =
                 ctor_pat_name(context, ploc, name)
             {
-                if is_positional {
+                if is_empty {
+                    let msg = "Invalid variant pattern. Empty variants \
+                               are not matched with variant field syntax";
+                    let mut diag = diag!(NameResolution::PositionalCallMismatch, (ploc, msg));
+                    diag.add_note("Remove '{}' after the variant name");
+                    context.env.add_diag(diag);
+                } else if is_positional {
                     let msg = "Invalid variant pattern. Positional variant declarations \
                                    require positional patterns.";
                     context
                         .env
                         .add_diag(diag!(NameResolution::PositionalCallMismatch, (ploc, msg)));
                 }
+
                 let args = args.map(|_, (idx, p)| (idx, pat(context, p)));
                 NP::Constructor(mident, enum_, variant, args)
             } else {
@@ -2151,9 +2227,10 @@ fn pat(context: &mut Context, sp!(ploc, pat_): E::MatchPattern) -> N::MatchPatte
             }
         }
         EP::HeadConstructor(name) => {
-            if let Some((mident, enum_, variant, _is_positional)) =
+            if let Some((mident, enum_, variant, _is_positional, _is_empty)) =
                 ctor_pat_name(context, ploc, name)
             {
+                // No need to chck is_empty / is_positional because typing will report the errors.
                 NP::Constructor(mident, enum_, variant, UniqueMap::new())
             } else {
                 assert!(context.env.has_errors());

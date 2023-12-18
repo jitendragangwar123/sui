@@ -8,8 +8,8 @@ use crate::{
     expansion::ast::{AbilitySet, AttributeName_, ModuleIdent, ModuleIdent_, Visibility},
     naming::ast::{
         self as N, BlockLabel, BuiltinTypeName_, DatatypeTypeParameter, EnumDefinition,
-        ResolvedUseFuns, StructDefinition, TParam, TParamID, TVar, Type,
-        TypeName, TypeName_, Type_, UseFunKind, Var,
+        ResolvedUseFuns, StructDefinition, TParam, TParamID, TVar, Type, TypeName, TypeName_,
+        Type_, UseFunKind, Var,
     },
     parser::ast::{
         Ability_, ConstantName, DatatypeName, Field, FunctionName, Mutability, VariantName,

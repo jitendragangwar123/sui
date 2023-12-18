@@ -1380,10 +1380,12 @@ impl Move2024PathExpander {
                         ModuleIdent(loc, sp(loc, ModuleIdent_::new(address, ModuleName(name))))
                     }
                     ModuleIdent(_, mident) => ModuleAccess(loc, EN::ModuleAccess(mident, name)),
-                    ModuleAccess(_, EN::ModuleAccess(mident, enum_name)) =>
-                        Variant(loc, EN::Variant(sp(rloc, (mident, enum_name)), name)),
-                    result @ ModuleAccess(_, _) =>
-                        ResolutionFailure(Box::new(result), InvalidKind("an enum".to_string())),
+                    ModuleAccess(_, EN::ModuleAccess(mident, enum_name)) => {
+                        Variant(loc, EN::Variant(sp(rloc, (mident, enum_name)), name))
+                    }
+                    result @ ModuleAccess(_, _) => {
+                        ResolutionFailure(Box::new(result), InvalidKind("an enum".to_string()))
+                    }
                     result @ Variant(_, _) => ResolutionFailure(
                         Box::new(result),
                         InvalidKind("a module or module member".to_string()),
@@ -1564,30 +1566,32 @@ impl PathExpander for Move2024PathExpander {
                             return None;
                         }
                         Variant(_, access) => access,
-                        Address(_, _) => {
+                        result @ Address(_, _) => {
                             context.env.add_diag(unexpected_access_error(
-                                resolved_name.loc(),
-                                "address".to_string(),
+                                result.loc(),
+                                result.err_name(),
                                 access,
                             ));
                             return None;
                         }
-                        ModuleIdent(_, sp!(_, ModuleIdent_ { address, module })) => {
-                            let mut diag = unexpected_access_error(
-                                resolved_name.loc(),
-                                "module".to_string(),
-                                access,
-                            );
-                            let base_str = format!("{}", chain);
-                            let realized_str = format!("{}::{}", address, module);
-                            if base_str != realized_str {
-                                diag.add_note(format!(
-                                    "Resolved '{}' to module identifier '{}'",
-                                    base_str, realized_str
-                                ));
-                            }
-                            context.env.add_diag(diag);
-                            return None;
+                        result @ ModuleIdent(_, sp!(_, ModuleIdent_ { .. })) => {
+                            let mut diag =
+                                unexpected_access_error(result.loc(), result.err_name(), access);
+                            if let ModuleIdent(_, sp!(_, ModuleIdent_ { address, module })) = result
+                            {
+                                let base_str = format!("{}", chain);
+                                let realized_str = format!("{}::{}", address, module);
+                                if base_str != realized_str {
+                                    diag.add_note(format!(
+                                        "Resolved '{}' to module identifier '{}'",
+                                        base_str, realized_str
+                                    ));
+                                }
+                                context.env.add_diag(diag);
+                                return None;
+                            } else {
+                                unreachable!()
+                            };
                         }
                         result @ ResolutionFailure(_, _) => {
                             context.env.add_diag(access_chain_resolution_error(result));
@@ -1606,11 +1610,12 @@ impl PathExpander for Move2024PathExpander {
                         match resolved_name {
                             UnresolvedName(_, name) => EN::Name(name),
                             ModuleAccess(_, access) => access,
-                            result @ (Address(_, _) | ModuleIdent(_, _) | Variant(_, _)) => {
+                            Variant(_, access) => access,
+                            result @ (Address(_, _) | ModuleIdent(_, _)) => {
                                 context.env.add_diag(unexpected_access_error(
                                     result.loc(),
                                     result.err_name(),
-                                    Access::Module,
+                                    Access::Term,
                                 ));
                                 return None;
                             }
@@ -1824,8 +1829,8 @@ fn module_members(
                 cur_members.insert(s.name.0, ModuleMemberKind::Struct);
             }
             P::ModuleMember::Enum(e) => {
-                  cur_members.insert(e.name.0, ModuleMemberKind::Enum);
-              }
+                cur_members.insert(e.name.0, ModuleMemberKind::Enum);
+            }
             P::ModuleMember::Spec(
                 sp!(
                     _,
@@ -3402,7 +3407,8 @@ fn match_pattern(context: &mut Context, sp!(loc, pat_): P::MatchPattern) -> E::M
 
     match pat_ {
         PP::PositionalConstructor(name_chain, pats) => {
-            let head_ctor_name = context.name_access_chain_to_module_access(Access::Variant, name_chain)
+            let head_ctor_name = context
+                .name_access_chain_to_module_access(Access::Variant, name_chain)
                 .and_then(|name| head_ctor_okay(context, name, false));
             match head_ctor_name {
                 Some(head_ctor_name @ sp!(_, EM::Variant(_, _))) => {
@@ -3421,7 +3427,8 @@ fn match_pattern(context: &mut Context, sp!(loc, pat_): P::MatchPattern) -> E::M
             }
         }
         PP::FieldConstructor(name_chain, fields) => {
-            let head_ctor_name = context.name_access_chain_to_module_access(Access::Variant, name_chain)
+            let head_ctor_name = context
+                .name_access_chain_to_module_access(Access::Variant, name_chain)
                 .and_then(|name| head_ctor_okay(context, name, false));
             match head_ctor_name {
                 Some(head_ctor_name @ sp!(_, EM::Variant(_, _))) => {
@@ -3437,7 +3444,8 @@ fn match_pattern(context: &mut Context, sp!(loc, pat_): P::MatchPattern) -> E::M
             }
         }
         PP::Name(name_chain) => {
-            let head_ctor_name = context.name_access_chain_to_module_access(Access::Variant, name_chain)
+            let head_ctor_name = context
+                .name_access_chain_to_module_access(Access::Variant, name_chain)
                 .and_then(|name| head_ctor_okay(context, name, true));
             match head_ctor_name {
                 Some(sp!(loc, EM::Name(name))) => sp(loc, EP::Binder(Var(name))),

@@ -1,9 +1,238 @@
-error[E01002]: unexpected token
-  ┌─ tests/move_2024/parser/match.move:2:12
-  │
-2 │     public enum Temperature {
-  │            ^^^^
-  │            │
-  │            Unexpected 'enum'
-  │            Expected a module member: 'spec', 'use', 'friend', 'const', 'fun', or 'struct'
+error[E05001]: ability constraint not satisfied
+   ┌─ tests/move_2024/parser/match.move:11:11
+   │
+ 2 │     public enum Temperature {
+   │                 ----------- To satisfy the constraint, the 'drop' ability would need to be added here
+   ·
+ 8 │     fun is_temperature_fahrenheit(t: &Temperature): bool {
+   │                                       ----------- The type '0x42::m::Temperature' does not have the ability 'drop'
+   ·
+11 │           _ => false,
+   │           ^ Cannot ignore values without the 'drop' ability. '_' patterns discard their values
+
+error[E04003]: built-in operation not supported
+   ┌─ tests/move_2024/parser/match.move:17:45
+   │
+ 3 │        Fahrenheit(u16),
+   │                   --- Found: '&u16'. But expected: 'u8', 'u16', 'u32', 'u64', 'u128', 'u256'
+   ·
+17 │           Temperature::Fahrenheit(temp) if (temp >= 212) => true,
+   │                                             ^^^^ Invalid argument to '>='
+
+error[E04007]: incompatible types
+   ┌─ tests/move_2024/parser/match.move:17:50
+   │
+ 3 │        Fahrenheit(u16),
+   │                   --- Found: '&u16'. It is not compatible with the other type.
+   ·
+17 │           Temperature::Fahrenheit(temp) if (temp >= 212) => true,
+   │                                                  ^^ --- Found: integer. It is not compatible with the other type.
+   │                                                  │   
+   │                                                  Incompatible arguments to '>='
+
+error[E04003]: built-in operation not supported
+   ┌─ tests/move_2024/parser/match.move:17:53
+   │
+ 3 │        Fahrenheit(u16),
+   │                   --- Found: '&u16'. But expected: 'u8', 'u16', 'u32', 'u64', 'u128', 'u256'
+   ·
+17 │           Temperature::Fahrenheit(temp) if (temp >= 212) => true,
+   │                                                     ^^^ Invalid argument to '>='
+
+error[E04003]: built-in operation not supported
+   ┌─ tests/move_2024/parser/match.move:18:45
+   │
+ 4 │        Celsius { temp: u16 },
+   │                        --- Found: '&u16'. But expected: 'u8', 'u16', 'u32', 'u64', 'u128', 'u256'
+   ·
+18 │           Temperature::Celsius { temp } if (temp >= 100) => true,
+   │                                             ^^^^ Invalid argument to '>='
+
+error[E04007]: incompatible types
+   ┌─ tests/move_2024/parser/match.move:18:50
+   │
+ 4 │        Celsius { temp: u16 },
+   │                        --- Found: '&u16'. It is not compatible with the other type.
+   ·
+18 │           Temperature::Celsius { temp } if (temp >= 100) => true,
+   │                                                  ^^ --- Found: integer. It is not compatible with the other type.
+   │                                                  │   
+   │                                                  Incompatible arguments to '>='
+
+error[E04003]: built-in operation not supported
+   ┌─ tests/move_2024/parser/match.move:18:53
+   │
+ 4 │        Celsius { temp: u16 },
+   │                        --- Found: '&u16'. But expected: 'u8', 'u16', 'u32', 'u64', 'u128', 'u256'
+   ·
+18 │           Temperature::Celsius { temp } if (temp >= 100) => true,
+   │                                                     ^^^ Invalid argument to '>='
+
+error[E05001]: ability constraint not satisfied
+   ┌─ tests/move_2024/parser/match.move:19:11
+   │
+ 2 │     public enum Temperature {
+   │                 ----------- To satisfy the constraint, the 'drop' ability would need to be added here
+   ·
+15 │     fun is_temperature_boiling(t: &Temperature): bool {
+   │                                    ----------- The type '0x42::m::Temperature' does not have the ability 'drop'
+   ·
+19 │           _ => false,
+   │           ^ Cannot ignore values without the 'drop' ability. '_' patterns discard their values
+
+error[E03004]: unbound type
+   ┌─ tests/move_2024/parser/match.move:50:41
+   │
+50 │     public fun option_default(o: Option<T>, default: T): Option<T> {
+   │                                         ^ Unbound type 'T' in current scope
+
+error[E03004]: unbound type
+   ┌─ tests/move_2024/parser/match.move:50:54
+   │
+50 │     public fun option_default(o: Option<T>, default: T): Option<T> {
+   │                                                      ^ Unbound type 'T' in current scope
+
+error[E03004]: unbound type
+   ┌─ tests/move_2024/parser/match.move:50:65
+   │
+50 │     public fun option_default(o: Option<T>, default: T): Option<T> {
+   │                                                                 ^ Unbound type 'T' in current scope
+
+warning[W09002]: unused variable
+   ┌─ tests/move_2024/parser/match.move:64:25
+   │
+64 │     public fun evaluate(expressions: vector<Expression>): u64 {
+   │                         ^^^^^^^^^^^ Unused parameter 'expressions'. Consider removing or prefixing with an underscore: '_expressions'
+   │
+   = This warning can be suppressed with '#[allow(unused_variable)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+error[E04010]: cannot infer type
+   ┌─ tests/move_2024/parser/match.move:66:21
+   │
+66 │         let stack = vector[];
+   │                     ^^^^^^^^ Could not infer this type. Try adding an annotation
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:67:17
+   │
+67 │         while (!vector::is_empty(expressions)) {
+   │                 ^^^^^^ Could not resolve the name 'vector'
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:68:20
+   │
+68 │             match (vector::pop_back(&mut expressions)) {
+   │                    ^^^^^^ Could not resolve the name 'vector'
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:71:30
+   │
+71 │                     let e1 = vector::pop_back(&mut stack);
+   │                              ^^^^^^ Could not resolve the name 'vector'
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:72:30
+   │
+72 │                     let e2 = vector::pop_back(&mut stack);
+   │                              ^^^^^^ Could not resolve the name 'vector'
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:73:21
+   │
+73 │                     vector::push_back(&mut stack, e1 + e2);
+   │                     ^^^^^^ Could not resolve the name 'vector'
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:76:30
+   │
+76 │                     let e1 = vector::pop_back(&mut stack);
+   │                              ^^^^^^ Could not resolve the name 'vector'
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:77:30
+   │
+77 │                     let e2 = vector::pop_back(&mut stack);
+   │                              ^^^^^^ Could not resolve the name 'vector'
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:78:21
+   │
+78 │                     vector::push_back(&mut stack, e1 + e2);
+   │                     ^^^^^^ Could not resolve the name 'vector'
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:81:21
+   │
+81 │                     vector::push_back(&mut stack, number);
+   │                     ^^^^^^ Could not resolve the name 'vector'
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:85:22
+   │
+85 │         let result = vector::pop_back(&mut stack);
+   │                      ^^^^^^ Could not resolve the name 'vector'
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:86:17
+   │
+86 │         assert!(vector::is_empty(expressions), EInvalidExpression);
+   │                 ^^^^^^ Could not resolve the name 'vector'
+
+error[E03005]: unbound unscoped name
+   ┌─ tests/move_2024/parser/match.move:86:48
+   │
+86 │         assert!(vector::is_empty(expressions), EInvalidExpression);
+   │                                                ^^^^^^^^^^^^^^^^^^ Unbound constant 'EInvalidExpression'
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:87:17
+   │
+87 │         assert!(vector::is_empty(stack), EInvalidExprrsion);
+   │                 ^^^^^^ Could not resolve the name 'vector'
+
+error[E03005]: unbound unscoped name
+   ┌─ tests/move_2024/parser/match.move:87:42
+   │
+87 │         assert!(vector::is_empty(stack), EInvalidExprrsion);
+   │                                          ^^^^^^^^^^^^^^^^^ Unbound constant 'EInvalidExprrsion'
+
+warning[W09002]: unused variable
+   ┌─ tests/move_2024/parser/match.move:91:30
+   │
+91 │     public fun count_numbers(expressions: vector<Expression>): u64 {
+   │                              ^^^^^^^^^^^ Unused parameter 'expressions'. Consider removing or prefixing with an underscore: '_expressions'
+   │
+   = This warning can be suppressed with '#[allow(unused_variable)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:94:17
+   │
+94 │         while (!vector::is_empty(expressions)) {
+   │                 ^^^^^^ Could not resolve the name 'vector'
+
+error[E03006]: unexpected name in this position
+   ┌─ tests/move_2024/parser/match.move:95:20
+   │
+95 │             match (vector::pop_back(&mut expressions)) {
+   │                    ^^^^^^ Could not resolve the name 'vector'
+
+warning[W09002]: unused variable
+    ┌─ tests/move_2024/parser/match.move:106:26
+    │
+106 │     public fun count_ops(expressions: vector<Expression>): u64 {
+    │                          ^^^^^^^^^^^ Unused parameter 'expressions'. Consider removing or prefixing with an underscore: '_expressions'
+    │
+    = This warning can be suppressed with '#[allow(unused_variable)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+error[E03006]: unexpected name in this position
+    ┌─ tests/move_2024/parser/match.move:109:17
+    │
+109 │         while (!vector::is_empty(expressions)) {
+    │                 ^^^^^^ Could not resolve the name 'vector'
+
+error[E03006]: unexpected name in this position
+    ┌─ tests/move_2024/parser/match.move:110:20
+    │
+110 │             match (vector::pop_back(&mut expressions)) {
+    │                    ^^^^^^ Could not resolve the name 'vector'
 

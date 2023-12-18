@@ -68,7 +68,8 @@ impl WrappingFieldInfo {
 }
 
 /// Structs (per-module) that have fields wrapping other objects.
-type WrappingFields = BTreeMap<E::ModuleIdent, BTreeMap<P::DatatypeName, Option<WrappingFieldInfo>>>;
+type WrappingFields =
+    BTreeMap<E::ModuleIdent, BTreeMap<P::DatatypeName, Option<WrappingFieldInfo>>>;
 
 pub struct FreezeWrappedVisitor;
 
