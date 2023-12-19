@@ -17,4 +17,10 @@ module 0x42::m {
         }
     }
 
+    fun test() {
+        assert!(fib(5) == 8, 0);
+    }
+
 }
+
+//# run 0x42::m::test

@@ -152,6 +152,10 @@ impl<'a> TypingVisitorContext for Context<'a> {
             struct_def(self, name, sdef)
         }
 
+        for (name, edef) in mdef.enums.key_cloned_iter() {
+            enum_def(self, name, edef)
+        }
+
         // do not skip module
         false
     }
@@ -243,6 +247,27 @@ fn invalid_object_id_field_diag(key_loc: Loc, loc: Loc, name: DatatypeName) -> D
         UID_TYPE_NAME
     );
     diag!(OBJECT_DECL_DIAG, (loc, msg), (key_loc, KEY_MSG))
+}
+
+//**************************************************************************************************
+// Enums
+//**************************************************************************************************
+
+fn enum_def(context: &mut Context, name: DatatypeName, edef: &N::EnumDefinition) {
+    let N::EnumDefinition {
+        warning_filter: _,
+        index: _,
+        attributes: _,
+        abilities,
+        type_parameters: _,
+        variants: _,
+    } = edef;
+    if let Some(key_loc) = abilities.ability_loc_(Ability_::Key) {
+        let msg = format!("Invalid object '{name}'");
+        let key_msg = format!("Enums cannot have the '{}' ability.", Ability_::Key);
+        let diag = diag!(OBJECT_DECL_DIAG, (name.loc(), msg), (key_loc, key_msg));
+        context.env.add_diag(diag);
+    };
 }
 
 //**************************************************************************************************

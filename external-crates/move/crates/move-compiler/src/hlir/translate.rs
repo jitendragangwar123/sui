@@ -453,7 +453,7 @@ fn function(context: &mut Context, _name: FunctionName, f: T::Function) -> H::Fu
         signature,
         body,
     } = f;
-    println!("---------- fn: {}", _name);
+    // println!("---------- fn: {}", _name);
     context.env.add_warning_filter_scope(warning_filter.clone());
     let signature = function_signature(context, signature);
     let body = function_body(context, &signature, body);
@@ -501,10 +501,10 @@ fn function_body(
             HB::Native
         }
         TB::Defined(seq) => {
-            seq.print_verbose();
+            // seq.print_verbose();
             let (locals, body) = function_body_defined(context, sig, loc, seq);
-            println!("----------------------");
-            body.print_verbose();
+            // println!("----------------------");
+            // body.print_verbose();
             HB::Defined { locals, body }
         }
     };
@@ -884,20 +884,20 @@ fn tail(
         }
 
         E::Match(subject, arms) => {
-            println!("compiling match!");
-            print!("subject:");
-            subject.print_verbose();
-            println!("\narms:");
-            for arm in &arms.value {
-                arm.value.print_verbose();
-            }
+            // println!("compiling match!");
+            // print!("subject:");
+            // subject.print_verbose();
+            // println!("\narms:");
+            // for arm in &arms.value {
+            //     arm.value.print_verbose();
+            // }
             let compiled = match_compilation::compile_match(context, in_type, *subject, arms);
-            println!("-----\ncompiled:");
-            compiled.print_verbose();
+            // println!("-----\ncompiled:");
+            // compiled.print_verbose();
             let result = tail(context, block, expected_type, compiled);
-            println!("-----\nresult:");
-            block.print_verbose();
-            result.clone().unwrap().print_verbose();
+            // println!("-----\nresult:");
+            // block.print_verbose();
+            // result.clone().unwrap().print_verbose();
             result
         }
 
@@ -1190,16 +1190,16 @@ fn value(
         }
 
         E::Match(subject, arms) => {
-            println!("compiling match!");
-            print!("subject:");
-            subject.print_verbose();
-            println!("\narms:");
-            for arm in &arms.value {
-                arm.value.print_verbose();
-            }
+            // println!("compiling match!");
+            // print!("subject:");
+            // subject.print_verbose();
+            // println!("\narms:");
+            // for arm in &arms.value {
+            //     arm.value.print_verbose();
+            // }
             let compiled = match_compilation::compile_match(context, in_type, *subject, arms);
-            println!("-----\ncompiled:");
-            compiled.print_verbose();
+            // println!("-----\ncompiled:");
+            // compiled.print_verbose();
             value(context, block, None, compiled)
         }
 
@@ -1795,17 +1795,17 @@ fn statement(context: &mut Context, block: &mut Block, e: T::Exp) {
             ));
         }
         E::Match(subject, arms) => {
-            println!("compiling match!");
-            print!("subject:");
-            subject.print_verbose();
-            println!("\narms:");
-            for arm in &arms.value {
-                arm.value.print_verbose();
-            }
+            // println!("compiling match!");
+            // print!("subject:");
+            // subject.print_verbose();
+            // println!("\narms:");
+            // for arm in &arms.value {
+            //     arm.value.print_verbose();
+            // }
             let subject_type = subject.ty.clone();
             let compiled = match_compilation::compile_match(context, &subject_type, *subject, arms);
-            println!("-----\ncompiled:");
-            compiled.print_verbose();
+            // println!("-----\ncompiled:");
+            // compiled.print_verbose();
             statement(context, block, compiled)
         }
         E::VariantMatch(subject, enum_name, arms) => {

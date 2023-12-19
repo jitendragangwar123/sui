@@ -1401,7 +1401,6 @@ fn parse_control_exp(context: &mut Context) -> Result<(Exp, bool), Box<Diagnosti
             consume_token(context.tokens, Tok::RParen)?;
             let arms = parse_match_arms(context)?;
             let result = Exp_::Match(subject_exp, arms);
-            result.print_verbose();
             (result, true)
         }
         _ => unreachable!(),
@@ -1554,11 +1553,6 @@ fn parse_match_pattern(context: &mut Context) -> Result<MatchPattern, Box<Diagno
     use MatchPattern_::*;
 
     fn parse_ctor_pattern(context: &mut Context) -> Result<MatchPattern, Box<Diagnostic>> {
-        println!(
-            "parsing ctor with {:?} ({})",
-            context.tokens.peek(),
-            context.tokens.content()
-        );
         match context.tokens.peek() {
             Tok::LParen => {
                 context.tokens.advance()?;
@@ -1621,7 +1615,6 @@ fn parse_match_pattern(context: &mut Context) -> Result<MatchPattern, Box<Diagno
     fn parse_field_pattern(
         context: &mut Context,
     ) -> Result<(Field, MatchPattern), Box<Diagnostic>> {
-        println!("parsing field with {:?}", context.tokens.peek());
         let field = parse_field(context)?;
         let pattern = if match_token(context.tokens, Tok::Colon)? {
             parse_match_pattern(context)?
@@ -1635,7 +1628,6 @@ fn parse_match_pattern(context: &mut Context) -> Result<MatchPattern, Box<Diagno
     }
 
     fn parse_at_pattern(context: &mut Context) -> Result<MatchPattern, Box<Diagnostic>> {
-        println!("parsing at with {:?}", context.tokens.peek());
         match context.tokens.peek() {
             Tok::Identifier if context.tokens.lookahead() == Ok(Tok::AtSign) => {
                 if context.tokens.content() == "_" {
@@ -1656,7 +1648,6 @@ fn parse_match_pattern(context: &mut Context) -> Result<MatchPattern, Box<Diagno
         }
     }
 
-    println!("parsing or with {:?}", context.tokens.peek());
     ok_with_loc!(context, {
         let lhs = parse_at_pattern(context)?;
         if matches!(context.tokens.peek(), Tok::Pipe) {

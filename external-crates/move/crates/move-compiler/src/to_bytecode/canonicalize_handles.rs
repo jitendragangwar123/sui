@@ -69,8 +69,6 @@ pub fn in_module(
     module: &mut CompiledModule,
     address_names: &HashMap<(AccountAddress, &str), Symbol>,
 ) {
-    println!("modules: {:#?}", module);
-    println!("idents: {:#?}", module.identifiers);
     // 1 (a). Choose ordering for identifiers.
     let identifiers = permutation(&module.identifiers, |_ix, ident| ident);
 

@@ -196,7 +196,6 @@ fn function(context: &mut Context, name: FunctionName, f: N::Function) -> T::Fun
         };
     function_signature(context, &signature);
     expand::function_signature(context, &mut signature);
-    println!("fn: {name}");
     let body = function_body(context, n_body);
     unused_let_muts(context);
     context.current_function = None;
@@ -233,7 +232,6 @@ fn function_body(context: &mut Context, sp!(loc, nb_): N::FunctionBody) -> T::Fu
     let mut b_ = match nb_ {
         N::FunctionBody_::Native => T::FunctionBody_::Native,
         N::FunctionBody_::Defined(es) => {
-            es.print_verbose();
             let seq = sequence(context, es);
             let ety = sequence_type(&seq);
             let ret_ty = context.return_type.clone().unwrap();
@@ -1941,7 +1939,6 @@ fn match_pattern(
                     .add_diag(diag!(TypeSafety::Visibility, (loc, msg)));
             }
             let bt = rtype!(bt);
-            println!("handling {variant} with {} tyargs", targs.len());
             let pat_ = if mut_ref.is_some() {
                 TP::BorrowConstructor(m, enum_, variant, targs, tfields)
             } else {
