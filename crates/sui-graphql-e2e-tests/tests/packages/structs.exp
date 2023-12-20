@@ -29,7 +29,7 @@ Response: {
                   "signature": {
                     "ref": null,
                     "body": {
-                      "struct": {
+                      "datatype": {
                         "package": "0x0000000000000000000000000000000000000000000000000000000000000002",
                         "module": "object",
                         "type": "UID",
@@ -46,7 +46,7 @@ Response: {
                   "signature": {
                     "ref": null,
                     "body": {
-                      "struct": {
+                      "datatype": {
                         "package": "0x0000000000000000000000000000000000000000000000000000000000000002",
                         "module": "balance",
                         "type": "Balance",
@@ -280,7 +280,7 @@ Response: {
                               "signature": {
                                 "ref": null,
                                 "body": {
-                                  "struct": {
+                                  "datatype": {
                                     "package": "0x57639e4802d65cb91af7d9a58b76631386c9714c95f18bfb502ef1f82165877b",
                                     "module": "m",
                                     "type": "S",
