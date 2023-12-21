@@ -2879,6 +2879,7 @@ fn pragma_value(context: &mut Context, pv: P::PragmaValue) -> Option<E::PragmaVa
         }
         P::PragmaValue::Ident(ma) => context
             .name_access_chain_to_module_access(Access::Term, ma)
+            .map(Box::new)
             .map(E::PragmaValue::Ident),
     }
 }
@@ -3406,10 +3407,11 @@ fn match_pattern(context: &mut Context, sp!(loc, pat_): P::MatchPattern) -> E::M
     }
 
     match pat_ {
-        PP::PositionalConstructor(name_chain, pats) => {
+        PP::PositionalConstructor(name_chain, pts_opt, pats) => {
             let head_ctor_name = context
                 .name_access_chain_to_module_access(Access::Variant, name_chain)
                 .and_then(|name| head_ctor_okay(context, name, false));
+            let tys = optional_types(context, pts_opt);
             match head_ctor_name {
                 Some(head_ctor_name @ sp!(_, EM::Variant(_, _))) => {
                     let ploc = pats.loc;
@@ -3420,16 +3422,17 @@ fn match_pattern(context: &mut Context, sp!(loc, pat_): P::MatchPattern) -> E::M
                         .collect();
                     sp(
                         loc,
-                        EP::PositionalConstructor(head_ctor_name, sp(ploc, pats)),
+                        EP::PositionalConstructor(head_ctor_name, tys, sp(ploc, pats)),
                     )
                 }
                 _ => error_pattern!(),
             }
         }
-        PP::FieldConstructor(name_chain, fields) => {
+        PP::FieldConstructor(name_chain, pts_opt, fields) => {
             let head_ctor_name = context
                 .name_access_chain_to_module_access(Access::Variant, name_chain)
                 .and_then(|name| head_ctor_okay(context, name, false));
+            let tys = optional_types(context, pts_opt);
             match head_ctor_name {
                 Some(head_ctor_name @ sp!(_, EM::Variant(_, _))) => {
                     let fields = fields
@@ -3438,19 +3441,20 @@ fn match_pattern(context: &mut Context, sp!(loc, pat_): P::MatchPattern) -> E::M
                         .map(|(field, pat)| (field, match_pattern(context, pat)))
                         .collect();
                     let fields = named_fields(context, loc, "pattern", "sub-pattern", fields);
-                    sp(loc, EP::FieldConstructor(head_ctor_name, fields))
+                    sp(loc, EP::FieldConstructor(head_ctor_name, tys, fields))
                 }
                 _ => error_pattern!(),
             }
         }
-        PP::Name(name_chain) => {
+        PP::Name(name_chain, pts_opt) => {
             let head_ctor_name = context
                 .name_access_chain_to_module_access(Access::Variant, name_chain)
                 .and_then(|name| head_ctor_okay(context, name, true));
+            let tys = optional_types(context, pts_opt);
             match head_ctor_name {
                 Some(sp!(loc, EM::Name(name))) => sp(loc, EP::Binder(Var(name))),
                 Some(head_ctor_name @ sp!(_, EM::Variant(_, _))) => {
-                    sp(loc, EP::HeadConstructor(head_ctor_name))
+                    sp(loc, EP::HeadConstructor(head_ctor_name, tys))
                 }
                 _ => error_pattern!(),
             }
@@ -3549,14 +3553,14 @@ fn pattern_binders(context: &mut Context, pattern: &E::MatchPattern) -> Vec<Var>
                 }
                 bindings
             }
-            EP::PositionalConstructor(_, sp!(_, patterns)) => {
+            EP::PositionalConstructor(_, _, sp!(_, patterns)) => {
                 let bindings = patterns
                     .iter()
                     .map(|pat| check_duplicates(context, pat))
                     .collect();
                 report_duplicates_and_combine(context, bindings)
             }
-            EP::FieldConstructor(_, fields) => {
+            EP::FieldConstructor(_, _, fields) => {
                 let mut bindings = vec![];
                 for (_, _, (_, pat)) in fields {
                     bindings.push(check_duplicates(context, pat));
@@ -3590,7 +3594,7 @@ fn pattern_binders(context: &mut Context, pattern: &E::MatchPattern) -> Vec<Var>
                 }
                 left_bindings
             }
-            EP::HeadConstructor(_) | EP::Wildcard | EP::Literal(_) => BTreeMap::new(),
+            EP::HeadConstructor(_, _) | EP::Wildcard | EP::Literal(_) => BTreeMap::new(),
         }
     }
 
@@ -3854,9 +3858,7 @@ fn assign(context: &mut Context, sp!(loc, e_): P::Exp) -> Option<E::LValue> {
                     {
                         let msg = "Unexpected assignment of variant";
                         let mut diag = diag!(Syntax::InvalidLValue, (loc, msg));
-                        diag.add_note(format!(
-                            "If you are trying to unpack an enum variant, use 'match'",
-                        ));
+                        diag.add_note("If you are trying to unpack an enum variant, use 'match'");
                         context.env().add_diag(diag);
                         None
                     } else {
@@ -4132,12 +4134,12 @@ fn unbound_names_sequence_item(unbound: &mut BTreeSet<Name>, sp!(_, es_): &E::Se
 fn unbound_names_match_pattern(unbound: &mut BTreeSet<Name>, sp!(_, pat): &E::MatchPattern) {
     use E::MatchPattern_ as EP;
     match pat {
-        EP::PositionalConstructor(_, sp!(_, pats)) => {
+        EP::PositionalConstructor(_, _, sp!(_, pats)) => {
             for pat in pats {
                 unbound_names_match_pattern(unbound, pat);
             }
         }
-        EP::FieldConstructor(_, fields) => {
+        EP::FieldConstructor(_, _, fields) => {
             for (_, _, (_, pat)) in fields {
                 unbound_names_match_pattern(unbound, pat);
             }
@@ -4153,7 +4155,7 @@ fn unbound_names_match_pattern(unbound: &mut BTreeSet<Name>, sp!(_, pat): &E::Ma
             unbound.remove(&x.0);
             unbound_names_match_pattern(unbound, inner);
         }
-        EP::HeadConstructor(_) | EP::Literal(_) | EP::Wildcard => (),
+        EP::HeadConstructor(_, _) | EP::Literal(_) | EP::Wildcard => (),
     }
 }
 

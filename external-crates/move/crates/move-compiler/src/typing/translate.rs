@@ -635,7 +635,7 @@ fn enum_def(context: &mut Context, enum_: &mut N::EnumDefinition) {
 fn variant_def(
     context: &mut Context,
     enum_abilities: &AbilitySet,
-    enum_tparams: &Vec<DatatypeTypeParameter>,
+    enum_tparams: &[DatatypeTypeParameter],
     v: &mut N::VariantDefinition,
 ) -> Vec<(usize, Type)> {
     context.reset_for_module_item();
@@ -746,7 +746,7 @@ fn check_variant_type_params_usage(
 ) {
     let has_unresolved = field_map
         .iter()
-        .any(|(_, ty)| has_unresolved_error_type(&ty));
+        .any(|(_, ty)| has_unresolved_error_type(ty));
 
     if has_unresolved {
         return;
@@ -1904,8 +1904,8 @@ fn match_pattern(
     }
 
     match pat_ {
-        P::Constructor(m, enum_, variant, fields) => {
-            let (bt, targs) = core::make_enum_type(context, loc, &m, &enum_, None);
+        P::Constructor(m, enum_, variant, tys_opt, fields) => {
+            let (bt, targs) = core::make_enum_type(context, loc, &m, &enum_, tys_opt);
             let typed_fields = add_variant_field_types(
                 context,
                 loc,

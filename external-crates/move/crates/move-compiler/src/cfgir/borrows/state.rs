@@ -788,7 +788,7 @@ impl BorrowState {
         loc: Loc,
         mut_: bool,
         rvalue: Value,
-        fields: &Vec<(Field, LValue)>,
+        fields: &[(Field, LValue)],
     ) -> (Diagnostics, Vec<Value>) {
         let mut diags = Diagnostics::new();
         let id = match rvalue {

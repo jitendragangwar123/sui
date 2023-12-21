@@ -261,6 +261,7 @@ codes!(
         InvalidImmVariableUsage:
             { msg: "invalid usage of immutable variable", severity: NonblockingError },
         InvalidControlFlow: { msg: "invalid control flow", severity: BlockingError },
+        IncompletePattern: { msg: "non-exhaustive pattern", severity: BlockingError },
     ],
     // errors for ability rules. mostly typing/translate
     AbilitySafety: [

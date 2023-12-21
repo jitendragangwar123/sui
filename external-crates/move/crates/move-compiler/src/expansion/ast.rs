@@ -377,7 +377,7 @@ pub type PragmaProperty = Spanned<PragmaProperty_>;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PragmaValue {
     Literal(Value),
-    Ident(ModuleAccess),
+    Ident(Box<ModuleAccess>),
 }
 
 //**************************************************************************************************
@@ -550,9 +550,9 @@ pub type MatchArm = Spanned<MatchArm_>;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum MatchPattern_ {
-    PositionalConstructor(ModuleAccess, Spanned<Vec<MatchPattern>>),
-    FieldConstructor(ModuleAccess, Fields<MatchPattern>),
-    HeadConstructor(ModuleAccess),
+    PositionalConstructor(ModuleAccess, Option<Vec<Type>>, Spanned<Vec<MatchPattern>>),
+    FieldConstructor(ModuleAccess, Option<Vec<Type>>, Fields<MatchPattern>),
+    HeadConstructor(ModuleAccess, Option<Vec<Type>>),
     Binder(Var),
     Literal(Value),
     Wildcard,
@@ -1965,16 +1965,26 @@ impl AstDebug for MatchPattern_ {
     fn ast_debug(&self, w: &mut AstWriter) {
         use MatchPattern_::*;
         match self {
-            PositionalConstructor(name, fields) => {
+            PositionalConstructor(name, tys_opt, fields) => {
                 name.ast_debug(w);
+                if let Some(ss) = tys_opt {
+                    w.write("<");
+                    ss.ast_debug(w);
+                    w.write(">");
+                }
                 w.write("(");
                 w.comma(fields.value.iter(), |w, pat| {
                     pat.ast_debug(w);
                 });
                 w.write(") ");
             }
-            FieldConstructor(name, fields) => {
+            FieldConstructor(name, tys_opt, fields) => {
                 name.ast_debug(w);
+                if let Some(ss) = tys_opt {
+                    w.write("<");
+                    ss.ast_debug(w);
+                    w.write(">");
+                }
                 w.write(" {");
                 w.comma(fields.key_cloned_iter(), |w, (field, (idx, pat))| {
                     w.write(format!(" {}#{} : ", field, idx));
@@ -1982,7 +1992,14 @@ impl AstDebug for MatchPattern_ {
                 });
                 w.write("} ");
             }
-            HeadConstructor(name) => name.ast_debug(w),
+            HeadConstructor(name, tys_opt) => {
+                name.ast_debug(w);
+                if let Some(ss) = tys_opt {
+                    w.write("<");
+                    ss.ast_debug(w);
+                    w.write(">");
+                }
+            }
             Binder(name) => w.write(format!("{}", name)),
             Literal(v) => v.ast_debug(w),
             Wildcard => w.write("_"),
@@ -2091,6 +2108,26 @@ impl AstDebug for FieldBindings {
                 });
                 w.write(")");
             }
+        }
+    }
+}
+
+// Display for Values
+
+impl std::fmt::Display for Value_ {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use Value_ as V;
+        match self {
+            V::Address(addr) => write!(f, "@{}", addr),
+            V::InferredNum(u) => write!(f, "{}", u),
+            V::U8(u) => write!(f, "{}", u),
+            V::U16(u) => write!(f, "{}", u),
+            V::U32(u) => write!(f, "{}", u),
+            V::U64(u) => write!(f, "{}", u),
+            V::U128(u) => write!(f, "{}", u),
+            V::U256(u) => write!(f, "{}", u),
+            V::Bool(b) => write!(f, "{}", b),
+            V::Bytearray(v) => write!(f, "{:?}", v), // Good enough?
         }
     }
 }

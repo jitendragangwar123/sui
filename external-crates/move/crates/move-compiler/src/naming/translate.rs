@@ -67,8 +67,8 @@ struct ResolvedModuleType {
 
 #[derive(Debug, Clone)]
 enum ModuleType {
-    Struct(StructType),
-    Enum(EnumType),
+    Struct(Box<StructType>),
+    Enum(Box<EnumType>),
 }
 
 impl ModuleType {
@@ -81,14 +81,20 @@ impl ModuleType {
 
     fn with_original_mident(self, mident: ModuleIdent) -> ModuleType {
         match self {
-            ModuleType::Struct(stype) => ModuleType::Struct(StructType {
-                original_mident: mident,
-                ..stype
-            }),
-            ModuleType::Enum(etype) => ModuleType::Enum(EnumType {
-                original_mident: mident,
-                ..etype
-            }),
+            ModuleType::Struct(stype) => {
+                let st = StructType {
+                    original_mident: mident,
+                    ..*stype
+                };
+                ModuleType::Struct(Box::new(st))
+            }
+            ModuleType::Enum(etype) => {
+                let et = EnumType {
+                    original_mident: mident,
+                    ..*etype
+                };
+                ModuleType::Enum(Box::new(et))
+            }
         }
     }
 }
@@ -185,12 +191,13 @@ impl<'env> Context<'env> {
                             let sname = s.value();
                             let is_positional =
                                 matches!(sdef.fields, E::StructFields::Positional(_));
-                            let type_info = ModuleType::Struct(StructType {
+                            let st = StructType {
                                 original_mident: mident,
                                 decl_loc: s.loc(),
                                 arity,
                                 is_positional,
-                            });
+                            };
+                            let type_info = ModuleType::Struct(Box::new(st));
                             (sname, type_info)
                         })
                         .collect::<BTreeMap<_, _>>();
@@ -208,17 +215,15 @@ impl<'env> Context<'env> {
                                         v.fields,
                                         E::VariantFields::Positional(_)
                                     ),
-                                    is_empty: matches!(
-                                        v.fields,
-                                        E::VariantFields::Empty
-                                    ),
+                                    is_empty: matches!(v.fields, E::VariantFields::Empty),
                                 });
-                            let type_info = ModuleType::Enum(EnumType {
+                            let et = EnumType {
                                 original_mident: mident,
                                 arity,
                                 decl_loc: e.loc(),
                                 variants,
-                            });
+                            };
+                            let type_info = ModuleType::Enum(Box::new(et));
                             (ename, type_info)
                         })
                         .collect::<BTreeMap<_, _>>();
@@ -642,7 +647,7 @@ impl<'env> Context<'env> {
                             ty_opts,
                             vdef.decl_loc,
                             vdef.is_positional,
-                            vdef.is_empty
+                            vdef.is_empty,
                         ))
                     } else {
                         let primary_msg = format!(
@@ -1669,7 +1674,8 @@ fn exp_(context: &mut Context, e: E::Exp) -> N::Exp {
                 }
                 Some((m, en, vn, tys_opt, dloc, is_positional, is_empty)) => {
                     if !is_empty {
-                        let msg = "Invalid variant instantiation. Non-empty variant instantiations \
+                        let msg =
+                            "Invalid variant instantiation. Non-empty variant instantiations \
                                    require arguments";
                         let defn_msg = "Variant is defined here.";
                         let mut diag = diag!(
@@ -2155,24 +2161,24 @@ fn pat(context: &mut Context, sp!(ploc, pat_): E::MatchPattern) -> N::MatchPatte
     use E::MatchPattern_ as EP;
     use N::MatchPattern_ as NP;
 
-    fn ctor_pat_name(
-        context: &mut Context,
-        loc: Loc,
-        name: E::ModuleAccess,
-    ) -> Option<(ModuleIdent, DatatypeName, VariantName, bool, bool)> {
-        if let Some((mident, enum_name, variant, _, _, is_positional, is_empty)) =
-            context.resolve_variant_name(loc, "pattern", name, None)
-        {
-            Some((mident, enum_name, variant, is_positional, is_empty))
-        } else {
-            None
-        }
-    }
+    // fn ctor_pat_name(
+    //     context: &mut Context,
+    //     loc: Loc,
+    //     name: E::ModuleAccess,
+    // ) -> Option<(ModuleIdent, DatatypeName, VariantName, Option<Vec<N::Type>>, bool, bool)> {
+    //     if let Some((mident, enum_name, variant, tys, _, is_positional, is_empty)) =
+    //         context.resolve_variant_name(loc, "pattern", name, None)
+    //     {
+    //         Some((mident, enum_name, variant, tys, is_positional, is_empty))
+    //     } else {
+    //         None
+    //     }
+    // }
 
     let pat_: N::MatchPattern_ = match pat_ {
-        EP::PositionalConstructor(name, args) => {
-            if let Some((mident, enum_, variant, is_positional, is_empty)) =
-                ctor_pat_name(context, ploc, name)
+        EP::PositionalConstructor(name, etys_opt, args) => {
+            if let Some((mident, enum_, variant, tys_opt, _, is_positional, is_empty)) =
+                context.resolve_variant_name(ploc, "pattern", name, etys_opt)
             {
                 if is_empty {
                     let msg = "Invalid variant pattern. Empty variants \
@@ -2195,15 +2201,15 @@ fn pat(context: &mut Context, sp!(ploc, pat_): E::MatchPattern) -> N::MatchPatte
                     },
                 ))
                 .unwrap();
-                NP::Constructor(mident, enum_, variant, args)
+                NP::Constructor(mident, enum_, variant, tys_opt, args)
             } else {
                 assert!(context.env.has_errors());
                 NP::ErrorPat
             }
         }
-        EP::FieldConstructor(name, args) => {
-            if let Some((mident, enum_, variant, is_positional, is_empty)) =
-                ctor_pat_name(context, ploc, name)
+        EP::FieldConstructor(name, etys_opt, args) => {
+            if let Some((mident, enum_, variant, tys_opt, _, is_positional, is_empty)) =
+                context.resolve_variant_name(ploc, "pattern", name, etys_opt)
             {
                 if is_empty {
                     let msg = "Invalid variant pattern. Empty variants \
@@ -2220,18 +2226,18 @@ fn pat(context: &mut Context, sp!(ploc, pat_): E::MatchPattern) -> N::MatchPatte
                 }
 
                 let args = args.map(|_, (idx, p)| (idx, pat(context, p)));
-                NP::Constructor(mident, enum_, variant, args)
+                NP::Constructor(mident, enum_, variant, tys_opt, args)
             } else {
                 assert!(context.env.has_errors());
                 NP::ErrorPat
             }
         }
-        EP::HeadConstructor(name) => {
-            if let Some((mident, enum_, variant, _is_positional, _is_empty)) =
-                ctor_pat_name(context, ploc, name)
+        EP::HeadConstructor(name, etys_opt) => {
+            if let Some((mident, enum_, variant, tys_opt, _, _is_positional, _is_empty)) =
+                context.resolve_variant_name(ploc, "pattern", name, etys_opt)
             {
                 // No need to chck is_empty / is_positional because typing will report the errors.
-                NP::Constructor(mident, enum_, variant, UniqueMap::new())
+                NP::Constructor(mident, enum_, variant, tys_opt, UniqueMap::new())
             } else {
                 assert!(context.env.has_errors());
                 NP::ErrorPat
@@ -3055,20 +3061,29 @@ fn spec_pat(used: &mut BTreeSet<(ModuleIdent, Neighbor)>, sp!(_, pat): &E::Match
             spec_pat(used, lhs);
             spec_pat(used, rhs);
         }
-        PositionalConstructor(name, args) => {
+        PositionalConstructor(name, tys_opt, args) => {
             spec_module_access(used, name);
+            if let Some(tys) = tys_opt {
+                spec_types(used, tys)
+            }
             for arg in &args.value {
                 spec_pat(used, arg);
             }
         }
-        FieldConstructor(name, args) => {
+        FieldConstructor(name, tys_opt, args) => {
             spec_module_access(used, name);
+            if let Some(tys) = tys_opt {
+                spec_types(used, tys)
+            }
             for (_, _, (_, arg)) in args {
                 spec_pat(used, arg);
             }
         }
-        HeadConstructor(name) => {
+        HeadConstructor(name, tys_opt) => {
             spec_module_access(used, name);
+            if let Some(tys) = tys_opt {
+                spec_types(used, tys)
+            }
         }
         At(_, pat) => {
             spec_pat(used, pat);

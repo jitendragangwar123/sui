@@ -122,7 +122,7 @@ type VariantFieldIndicies = UniqueMap<
 >;
 
 pub struct Context<'env> {
-    env: &'env mut CompilationEnv,
+    pub env: &'env mut CompilationEnv,
     current_package: Option<Symbol>,
     structs: UniqueMap<ModuleIdent, UniqueMap<DatatypeName, UniqueMap<Field, usize>>>,
     enum_variants: UniqueMap<ModuleIdent, UniqueMap<DatatypeName, Vec<VariantName>>>,

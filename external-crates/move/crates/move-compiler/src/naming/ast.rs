@@ -387,7 +387,13 @@ pub type MatchArm = Spanned<MatchArm_>;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum MatchPattern_ {
-    Constructor(ModuleIdent, DatatypeName, VariantName, Fields<MatchPattern>),
+    Constructor(
+        ModuleIdent,
+        DatatypeName,
+        VariantName,
+        Option<Vec<Type>>,
+        Fields<MatchPattern>,
+    ),
     Binder(Var),
     Literal(Value),
     Wildcard,
@@ -1571,8 +1577,13 @@ impl AstDebug for MatchPattern_ {
     fn ast_debug(&self, w: &mut AstWriter) {
         use MatchPattern_::*;
         match self {
-            Constructor(mident, enum_, variant, fields) => {
+            Constructor(mident, enum_, variant, tys_opt, fields) => {
                 w.write(format!("{}::{}::{}", mident, enum_, variant));
+                if let Some(ss) = tys_opt {
+                    w.write("<");
+                    ss.ast_debug(w);
+                    w.write(">");
+                }
                 w.comma(fields.key_cloned_iter(), |w, (field, (idx, pat))| {
                     w.write(format!(" {}#{} : ", field, idx));
                     pat.ast_debug(w);

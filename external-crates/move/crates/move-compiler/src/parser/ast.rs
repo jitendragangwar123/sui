@@ -741,9 +741,17 @@ pub type MatchArm = Spanned<MatchArm_>;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum MatchPattern_ {
-    PositionalConstructor(NameAccessChain, Spanned<Vec<MatchPattern>>),
-    FieldConstructor(NameAccessChain, Spanned<Vec<(Field, MatchPattern)>>),
-    Name(NameAccessChain),
+    PositionalConstructor(
+        NameAccessChain,
+        Option<Vec<Type>>,
+        Spanned<Vec<MatchPattern>>,
+    ),
+    FieldConstructor(
+        NameAccessChain,
+        Option<Vec<Type>>,
+        Spanned<Vec<(Field, MatchPattern)>>,
+    ),
+    Name(NameAccessChain, Option<Vec<Type>>),
     Literal(Value),
     Wildcard,
     Or(Box<MatchPattern>, Box<MatchPattern>),
@@ -2079,16 +2087,26 @@ impl AstDebug for MatchPattern_ {
     fn ast_debug(&self, w: &mut AstWriter) {
         use MatchPattern_::*;
         match self {
-            PositionalConstructor(name, fields) => {
+            PositionalConstructor(name, tys_opt, fields) => {
                 name.ast_debug(w);
+                if let Some(ss) = tys_opt {
+                    w.write("<");
+                    ss.ast_debug(w);
+                    w.write(">");
+                }
                 w.write("(");
                 w.comma(fields.value.iter(), |w, pat| {
                     pat.ast_debug(w);
                 });
                 w.write(") ");
             }
-            FieldConstructor(name, fields) => {
+            FieldConstructor(name, tys_opt, fields) => {
                 name.ast_debug(w);
+                if let Some(ss) = tys_opt {
+                    w.write("<");
+                    ss.ast_debug(w);
+                    w.write(">");
+                }
                 w.write(" {");
                 w.comma(fields.value.iter(), |w, (field, pat)| {
                     w.write(format!(" {} : ", field));
@@ -2096,7 +2114,14 @@ impl AstDebug for MatchPattern_ {
                 });
                 w.write("} ");
             }
-            Name(name) => name.ast_debug(w),
+            Name(name, tys_opt) => {
+                if let Some(ss) = tys_opt {
+                    w.write("<");
+                    ss.ast_debug(w);
+                    w.write(">");
+                }
+                name.ast_debug(w)
+            }
             Literal(v) => v.ast_debug(w),
             Wildcard => w.write("_"),
             Or(lhs, rhs) => {

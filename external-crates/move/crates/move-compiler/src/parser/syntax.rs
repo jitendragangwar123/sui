@@ -1533,19 +1533,6 @@ fn parse_match_arm(context: &mut Context) -> Result<MatchArm, Box<Diagnostic>> {
     })
 }
 
-// Parses a match pattern:
-// <MatchPat> = <AtPat> "|" <AtPat>
-//
-// <AtPat> = <Identifier> "@" <CtorPat>  // if identifier is not "_"
-//
-// <CtorPat> = <Value>
-//            | "_"
-//            | "(" <MatchPat> ")"
-//            | <NameAccessChain>
-//            | <NameAccessChain> "(" (<MatchPat>,)+ ")"
-//            | <NameAccessChain> "{" (<Identifier> ":" <MatchPat>,)+ ")"
-//
-
 fn parse_match_pattern(context: &mut Context) -> Result<MatchPattern, Box<Diagnostic>> {
     const WILDCARD_AT_ERROR_MSG: &str = "Can't use '_' as a binder in an '@' pattern";
     const INVALID_PAT_ERROR_MSG: &str = "Invalid pattern";
@@ -1569,6 +1556,8 @@ fn parse_match_pattern(context: &mut Context) -> Result<MatchPattern, Box<Diagno
             }
             Tok::Identifier => ok_with_loc!(context, {
                 let name_access_chain = parse_name_access_chain(context, || "a pattern entry")?;
+                let ty_args = parse_optional_type_args(context)?;
+
                 match context.tokens.peek() {
                     Tok::LParen => {
                         let (loc, patterns) = with_loc!(
@@ -1581,7 +1570,7 @@ fn parse_match_pattern(context: &mut Context) -> Result<MatchPattern, Box<Diagno
                                 "a pattern",
                             )?
                         );
-                        PositionalConstructor(name_access_chain, sp(loc, patterns))
+                        PositionalConstructor(name_access_chain, ty_args, sp(loc, patterns))
                     }
                     Tok::LBrace => {
                         let (loc, patterns) = with_loc!(
@@ -1594,9 +1583,9 @@ fn parse_match_pattern(context: &mut Context) -> Result<MatchPattern, Box<Diagno
                                 "a field pattern",
                             )?
                         );
-                        FieldConstructor(name_access_chain, sp(loc, patterns))
+                        FieldConstructor(name_access_chain, ty_args, sp(loc, patterns))
                     }
-                    _ => Name(name_access_chain),
+                    _ => Name(name_access_chain, ty_args),
                 }
             }),
             _ => {
@@ -1621,7 +1610,7 @@ fn parse_match_pattern(context: &mut Context) -> Result<MatchPattern, Box<Diagno
         } else {
             sp(
                 field.loc(),
-                Name(sp(field.loc(), NameAccessChain_::One(field.0))),
+                Name(sp(field.loc(), NameAccessChain_::One(field.0)), None),
             )
         };
         Ok((field, pattern))
