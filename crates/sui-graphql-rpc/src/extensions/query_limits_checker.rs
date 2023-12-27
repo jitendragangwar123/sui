@@ -3,6 +3,7 @@
 
 use crate::config::Limits;
 use crate::config::ServiceConfig;
+use crate::config::DEFAULT_PAGE_SIZE;
 use crate::error::code;
 use crate::error::code::BAD_USER_INPUT;
 use crate::error::code::INTERNAL_SERVER_ERROR;
@@ -432,7 +433,7 @@ fn estimate_output_nodes_for_curr_node(
     // Otherwise, this node is considered a connection and has count set to default_page_size.
     if f.node.name.node == "edges" || f.node.name.node == "nodes" {
         if !parent_is_connection {
-            current_count = 50; // TODO: set to default_page_size
+            current_count = DEFAULT_PAGE_SIZE;
             is_connection = true;
         }
     } else {
