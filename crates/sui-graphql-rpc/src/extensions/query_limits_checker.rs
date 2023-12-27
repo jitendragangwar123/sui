@@ -266,8 +266,6 @@ impl QueryLimitsChecker {
                             ));
                         }
 
-                        println!("Current field: {}", f.node.name.node);
-
                         let (current_count, is_connection) =
                             estimate_output_nodes_for_curr_node(f, variables, parent_is_connection)
                                 .map_err(|_| {
@@ -278,23 +276,12 @@ impl QueryLimitsChecker {
                                     )
                                 })?;
 
-                        println!("Current count: {}", current_count);
-                        println!("Parent count: {}", parent_count);
                         let final_count = parent_count * current_count;
-                        println!("Final count: {}", final_count);
-                        println!("Parent is connection {}", parent_is_connection);
-                        println!("Is connection {}", is_connection);
-                        println!(
-                            "Estimated output nodes before update: {}",
-                            cost.output_nodes
-                        );
 
                         // Only update the "global" tally if this is a connection
                         if is_connection {
                             cost.output_nodes += final_count;
                         }
-
-                        println!("Estimated output nodes after update: {}", cost.output_nodes);
 
                         for field_sel in f.node.selection_set.node.items.iter() {
                             que.push_back((field_sel, final_count, is_connection));
@@ -374,7 +361,6 @@ impl QueryLimitsChecker {
         if cost.output_nodes < 1 {
             cost.output_nodes = 1;
         }
-        println!("Final estimated output nodes: {}", cost.output_nodes);
         Ok(())
     }
 }
