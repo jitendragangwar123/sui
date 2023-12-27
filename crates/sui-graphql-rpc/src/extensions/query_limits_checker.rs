@@ -388,6 +388,9 @@ impl QueryLimitsChecker {
             level_len = que.len();
         }
 
+        if estimated_output_nodes < 1 {
+            estimated_output_nodes = 1;
+        }
         println!("Final estimated output nodes: {}", estimated_output_nodes);
         Ok(())
     }
