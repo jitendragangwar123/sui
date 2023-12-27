@@ -45,6 +45,7 @@ pub(crate) struct ShowUsage;
 #[derive(Clone, Debug, Default)]
 struct ValidationRes {
     num_nodes: u32,
+    output_nodes: u64,
     depth: u32,
     num_variables: u32,
     num_fragments: u32,
@@ -117,6 +118,7 @@ impl Extension for QueryLimitsChecker {
                 "usage",
                 value! ({
                     "nodes": validation_result.num_nodes,
+                    "output_nodes": validation_result.output_nodes,
                     "depth": validation_result.depth,
                     "variables": validation_result.num_variables,
                     "fragments": validation_result.num_fragments,
@@ -194,6 +196,7 @@ impl Extension for QueryLimitsChecker {
         if ctx.data_opt::<ShowUsage>().is_some() {
             *self.validation_result.lock().await = Some(ValidationRes {
                 num_nodes: running_costs.num_nodes,
+                output_nodes: running_costs.output_nodes,
                 depth: running_costs.depth,
                 query_payload: query.len() as u32,
                 num_variables: variables.len() as u32,
