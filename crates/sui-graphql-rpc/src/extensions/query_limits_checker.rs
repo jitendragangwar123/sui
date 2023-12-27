@@ -210,15 +210,25 @@ impl QueryLimitsChecker {
     ) -> ServerResult<()> {
         // Use BFS to analyze the query and count the number of nodes and the depth of the query
 
-        let mut estimated_total_output_nodes: u64 = 0;
+        let mut estimated_output_nodes: u64 = 0;
 
         // Queue to store the nodes at each level
         let mut que = VecDeque::new();
 
         for top_level_sel in sel_set.node.items.iter() {
-            que.push_back((top_level_sel, 1 as u64, false)); // cost of top level is 1, initialize to false - not a connection
+            que.push_back((
+                top_level_sel,
+                /* estimated_output */ 1 as u64,
+                /* is_connection */ false,
+            ));
             cost.num_nodes += 1;
-            check_limits(limits, cost.num_nodes, cost.depth, Some(top_level_sel.pos))?;
+            check_limits(
+                limits,
+                cost.num_nodes,
+                cost.depth,
+                estimated_output_nodes,
+                Some(top_level_sel.pos),
+            )?;
         }
 
         // Track the number of nodes at first level if any
@@ -228,7 +238,13 @@ impl QueryLimitsChecker {
             // Signifies the start of a new level
             cost.depth += 1;
             // TODO: this is where we check current output node estimation as well
-            check_limits(limits, cost.num_nodes, cost.depth, None)?;
+            check_limits(
+                limits,
+                cost.num_nodes,
+                cost.depth,
+                estimated_output_nodes,
+                None,
+            )?;
             while level_len > 0 {
                 // Ok to unwrap since we checked for empty queue
                 // and level_len > 0
@@ -250,10 +266,12 @@ impl QueryLimitsChecker {
                         let mut is_connection = false;
                         let mut current_count = 1;
 
+                        // Process the current node as a Connection
+
+                        // If the current field is 'edges' or 'nodes' and parent_is_connection is false,
+                        // that means 'first' or 'last' were not provided and we should use the default_page_size
                         if f.node.name.node == "edges" || f.node.name.node == "nodes" {
-                            println!("Found edge or node");
                             if !parent_is_connection {
-                                // assumes that we did not detect a connection in the parent node - this happens when first or last is not provided
                                 current_count = 50; // TODO: set to default_page_size
                                 is_connection = true;
                             }
@@ -270,20 +288,19 @@ impl QueryLimitsChecker {
                                 .map(|arg| extract_end_count(arg, variables))
                                 .transpose()?;
 
-                            match (first_count, last_count) {
-                                (Some(first), Some(last)) => {
-                                    current_count = std::cmp::min(first, last);
+                            // This follows the cursor spec for when both args are provided
+                            // the resulting slice is the min of the two
+                            let min_count = match (first_count, last_count) {
+                                (Some(first), Some(last)) => Some(std::cmp::min(first, last)),
+                                _ => first_count.or(last_count),
+                            };
+
+                            match min_count {
+                                Some(count) => {
+                                    current_count = count;
                                     is_connection = true;
                                 }
-                                (Some(first), None) => {
-                                    current_count = first;
-                                    is_connection = true;
-                                }
-                                (None, Some(last)) => {
-                                    current_count = last;
-                                    is_connection = true;
-                                }
-                                (None, None) => {
+                                None => {
                                     is_connection = false;
                                 }
                             };
@@ -291,20 +308,21 @@ impl QueryLimitsChecker {
 
                         final_count *= current_count;
 
+                        // Only update the "global" tally if this is a connection
                         if is_connection {
-                            estimated_total_output_nodes += final_count;
-                            println!(
-                                "In a connection. Estimated output nodes for this level: {}",
-                                final_count
-                            );
-                        } else {
-                            println!("Not in a connection");
+                            estimated_output_nodes += final_count;
                         }
 
                         for field_sel in f.node.selection_set.node.items.iter() {
                             que.push_back((field_sel, final_count, is_connection));
                             cost.num_nodes += 1;
-                            check_limits(limits, cost.num_nodes, cost.depth, Some(field_sel.pos))?;
+                            check_limits(
+                                limits,
+                                cost.num_nodes,
+                                cost.depth,
+                                estimated_output_nodes,
+                                Some(field_sel.pos),
+                            )?;
                         }
                     }
 
@@ -334,7 +352,13 @@ impl QueryLimitsChecker {
                         for frag_sel in frag_def.node.selection_set.node.items.iter() {
                             que.push_back((frag_sel, parent_count, parent_is_connection));
                             cost.num_nodes += 1;
-                            check_limits(limits, cost.num_nodes, cost.depth, Some(frag_sel.pos))?;
+                            check_limits(
+                                limits,
+                                cost.num_nodes,
+                                cost.depth,
+                                estimated_output_nodes,
+                                Some(frag_sel.pos),
+                            )?;
                         }
                     }
 
@@ -353,6 +377,7 @@ impl QueryLimitsChecker {
                                 limits,
                                 cost.num_nodes,
                                 cost.depth,
+                                estimated_output_nodes,
                                 Some(in_frag_sel.pos),
                             )?;
                         }
@@ -363,15 +388,18 @@ impl QueryLimitsChecker {
             level_len = que.len();
         }
 
-        println!(
-            "Final estimated output nodes: {}",
-            estimated_total_output_nodes
-        );
+        println!("Final estimated output nodes: {}", estimated_output_nodes);
         Ok(())
     }
 }
 
-fn check_limits(limits: &Limits, nodes: u32, depth: u32, pos: Option<Pos>) -> ServerResult<()> {
+fn check_limits(
+    limits: &Limits,
+    nodes: u32,
+    depth: u32,
+    output_nodes: u64,
+    pos: Option<Pos>,
+) -> ServerResult<()> {
     if nodes > limits.max_query_nodes {
         return Err(ServerError::new(
             format!(
