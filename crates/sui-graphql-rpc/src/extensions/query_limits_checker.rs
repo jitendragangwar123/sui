@@ -20,11 +20,13 @@ use async_graphql::Pos;
 use async_graphql::Positioned;
 use async_graphql::Response;
 use async_graphql::ServerResult;
+use async_graphql::Value;
 use async_graphql::Variables;
 use async_graphql::{
     extensions::{Extension, ExtensionContext, ExtensionFactory},
     ServerError,
 };
+use async_graphql_value::Value as GqlValue;
 use axum::headers;
 use axum::http::HeaderName;
 use axum::http::HeaderValue;
@@ -81,6 +83,7 @@ impl ExtensionFactory for QueryLimitsChecker {
 struct ComponentCost {
     pub num_nodes: u32,
     pub depth: u32,
+    // pub output_nodes: u32
 }
 
 impl std::ops::Add for ComponentCost {
@@ -149,6 +152,7 @@ impl Extension for QueryLimitsChecker {
         };
         let mut max_depth_seen = 0;
 
+        // An operation is a query, mutation or subscription consisting of a set of selections
         for (count, (_name, oper)) in doc.operations.iter().enumerate() {
             let sel_set = &oper.node.selection_set;
 
@@ -166,7 +170,13 @@ impl Extension for QueryLimitsChecker {
             }
 
             running_costs.depth = 0;
-            self.analyze_selection_set(&cfg.limits, &doc.fragments, sel_set, &mut running_costs)?;
+            self.analyze_selection_set(
+                &cfg.limits,
+                &doc.fragments,
+                sel_set,
+                &mut running_costs,
+                variables,
+            )?;
             max_depth_seen = max_depth_seen.max(running_costs.depth);
         }
 
@@ -189,20 +199,24 @@ impl Extension for QueryLimitsChecker {
 }
 
 impl QueryLimitsChecker {
+    // selection set are all the fields selected in one operation
     fn analyze_selection_set(
         &self,
         limits: &Limits,
         fragment_defs: &HashMap<Name, Positioned<FragmentDefinition>>,
         sel_set: &Positioned<SelectionSet>,
         cost: &mut ComponentCost,
+        variables: &Variables,
     ) -> ServerResult<()> {
         // Use BFS to analyze the query and count the number of nodes and the depth of the query
+
+        let mut estimated_total_output_nodes: u64 = 0;
 
         // Queue to store the nodes at each level
         let mut que = VecDeque::new();
 
         for top_level_sel in sel_set.node.items.iter() {
-            que.push_back(top_level_sel);
+            que.push_back((top_level_sel, 1 as u64, false)); // cost of top level is 1, initialize to false - not a connection
             cost.num_nodes += 1;
             check_limits(limits, cost.num_nodes, cost.depth, Some(top_level_sel.pos))?;
         }
@@ -213,11 +227,12 @@ impl QueryLimitsChecker {
         while !que.is_empty() {
             // Signifies the start of a new level
             cost.depth += 1;
+            // TODO: this is where we check current output node estimation as well
             check_limits(limits, cost.num_nodes, cost.depth, None)?;
             while level_len > 0 {
                 // Ok to unwrap since we checked for empty queue
                 // and level_len > 0
-                let curr_sel = que.pop_front().unwrap();
+                let (curr_sel, parent_count, parent_is_connection) = que.pop_front().unwrap();
 
                 match &curr_sel.node {
                     Selection::Field(f) => {
@@ -228,12 +243,71 @@ impl QueryLimitsChecker {
                                 f.pos,
                             ));
                         }
+
+                        println!("Name: {}", f.node.name.node);
+
+                        let mut final_count = parent_count;
+                        let mut is_connection = false;
+                        let mut current_count = 1;
+
+                        if f.node.name.node == "edges" || f.node.name.node == "nodes" {
+                            println!("Found edge or node");
+                            if !parent_is_connection {
+                                // assumes that we did not detect a connection in the parent node - this happens when first or last is not provided
+                                current_count = 50; // TODO: set to default_page_size
+                                is_connection = true;
+                            }
+                        } else {
+                            // try to process the current node as a Connection
+                            let first_count = f
+                                .node
+                                .get_argument("first")
+                                .map(|arg| extract_end_count(arg, variables))
+                                .transpose()?;
+                            let last_count = f
+                                .node
+                                .get_argument("last")
+                                .map(|arg| extract_end_count(arg, variables))
+                                .transpose()?;
+
+                            match (first_count, last_count) {
+                                (Some(first), Some(last)) => {
+                                    current_count = std::cmp::min(first, last);
+                                    is_connection = true;
+                                }
+                                (Some(first), None) => {
+                                    current_count = first;
+                                    is_connection = true;
+                                }
+                                (None, Some(last)) => {
+                                    current_count = last;
+                                    is_connection = true;
+                                }
+                                (None, None) => {
+                                    is_connection = false;
+                                }
+                            };
+                        }
+
+                        final_count *= current_count;
+
+                        if is_connection {
+                            estimated_total_output_nodes += final_count;
+                            println!(
+                                "In a connection. Estimated output nodes for this level: {}",
+                                final_count
+                            );
+                        } else {
+                            println!("Not in a connection");
+                        }
+
                         for field_sel in f.node.selection_set.node.items.iter() {
-                            que.push_back(field_sel);
+                            que.push_back((field_sel, final_count, is_connection));
                             cost.num_nodes += 1;
                             check_limits(limits, cost.num_nodes, cost.depth, Some(field_sel.pos))?;
                         }
                     }
+
                     Selection::FragmentSpread(fs) => {
                         let frag_name = &fs.node.fragment_name.node;
                         let frag_def = fragment_defs.get(frag_name).ok_or_else(|| {
@@ -258,11 +332,12 @@ impl QueryLimitsChecker {
                             ));
                         }
                         for frag_sel in frag_def.node.selection_set.node.items.iter() {
-                            que.push_back(frag_sel);
+                            que.push_back((frag_sel, parent_count, parent_is_connection));
                             cost.num_nodes += 1;
                             check_limits(limits, cost.num_nodes, cost.depth, Some(frag_sel.pos))?;
                         }
                     }
+
                     Selection::InlineFragment(fs) => {
                         if !fs.node.directives.is_empty() {
                             return Err(graphql_error_at_pos(
@@ -272,7 +347,7 @@ impl QueryLimitsChecker {
                             ));
                         }
                         for in_frag_sel in fs.node.selection_set.node.items.iter() {
-                            que.push_back(in_frag_sel);
+                            que.push_back((in_frag_sel, parent_count, parent_is_connection));
                             cost.num_nodes += 1;
                             check_limits(
                                 limits,
@@ -287,6 +362,11 @@ impl QueryLimitsChecker {
             }
             level_len = que.len();
         }
+
+        println!(
+            "Final estimated output nodes: {}",
+            estimated_total_output_nodes
+        );
         Ok(())
     }
 }
@@ -313,4 +393,60 @@ fn check_limits(limits: &Limits, nodes: u32, depth: u32, pos: Option<Pos>) -> Se
     }
 
     Ok(())
+}
+
+fn extract_end_count(arg_value: &Positioned<GqlValue>, variables: &Variables) -> ServerResult<u64> {
+    match &arg_value.node {
+        GqlValue::Variable(var) => {
+            let result = variables.get(var).ok_or_else(|| {
+                graphql_error_at_pos(
+                    INTERNAL_SERVER_ERROR,
+                    "first or last argument must be a positive integer",
+                    arg_value.pos,
+                )
+            })?;
+
+            match result {
+                Value::Number(num) => {
+                    if !num.is_u64() {
+                        return Err(graphql_error_at_pos(
+                            INTERNAL_SERVER_ERROR,
+                            "first or last argument must be a positive integer",
+                            arg_value.pos,
+                        ));
+                    }
+                    num.as_u64()
+                }
+                _ => {
+                    return Err(graphql_error_at_pos(
+                        INTERNAL_SERVER_ERROR,
+                        "first or last argument must be a positive integer",
+                        arg_value.pos,
+                    ));
+                }
+            }
+        }
+        GqlValue::Number(num) => {
+            if !num.is_u64() {
+                return Err(graphql_error_at_pos(
+                    INTERNAL_SERVER_ERROR,
+                    "first or last argument must be a positive integer",
+                    arg_value.pos,
+                ));
+            }
+            num.as_u64()
+        }
+        _ => {
+            return Err(graphql_error_at_pos(
+                INTERNAL_SERVER_ERROR,
+                "first or last argument must be a positive integer",
+                arg_value.pos,
+            ));
+        }
+    }
+    .ok_or(graphql_error_at_pos(
+        INTERNAL_SERVER_ERROR,
+        "first or last argument must be a positive integer",
+        arg_value.pos,
+    ))
 }
