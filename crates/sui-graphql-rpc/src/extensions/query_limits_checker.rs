@@ -4,6 +4,7 @@
 use crate::config::Limits;
 use crate::config::ServiceConfig;
 use crate::error::code;
+use crate::error::code::BAD_USER_INPUT;
 use crate::error::code::INTERNAL_SERVER_ERROR;
 use crate::error::graphql_error;
 use crate::error::graphql_error_at_pos;
@@ -11,6 +12,7 @@ use crate::metrics::RequestMetrics;
 use async_graphql::extensions::NextParseQuery;
 use async_graphql::extensions::NextRequest;
 use async_graphql::parser::types::ExecutableDocument;
+use async_graphql::parser::types::Field;
 use async_graphql::parser::types::FragmentDefinition;
 use async_graphql::parser::types::Selection;
 use async_graphql::parser::types::SelectionSet;
@@ -52,6 +54,13 @@ struct ValidationRes {
 #[derive(Debug, Default)]
 pub(crate) struct QueryLimitsChecker {
     validation_result: Mutex<Option<ValidationRes>>,
+}
+
+pub(crate) enum ParseQueryError {
+    NotFound,
+    NotU64,
+    NotANumber,
+    FailedToU64,
 }
 
 impl headers::Header for ShowUsage {
@@ -199,7 +208,7 @@ impl Extension for QueryLimitsChecker {
 }
 
 impl QueryLimitsChecker {
-    // selection set are all the fields selected in one operation
+    /// Parse the selected fields in one operation and check if it conforms to configured limits.
     fn analyze_selection_set(
         &self,
         limits: &Limits,
@@ -210,15 +219,15 @@ impl QueryLimitsChecker {
     ) -> ServerResult<()> {
         // Use BFS to analyze the query and count the number of nodes and the depth of the query
 
-        let mut estimated_output_nodes: u64 = 0;
-
         // Queue to store the nodes at each level
         let mut que = VecDeque::new();
+
+        let mut estimated_output_nodes: u64 = 0;
 
         for top_level_sel in sel_set.node.items.iter() {
             que.push_back((
                 top_level_sel,
-                /* estimated_output */ 1 as u64,
+                /* estimated_output_nodes */ 1 as u64,
                 /* is_connection */ false,
             ));
             cost.num_nodes += 1;
@@ -237,7 +246,6 @@ impl QueryLimitsChecker {
         while !que.is_empty() {
             // Signifies the start of a new level
             cost.depth += 1;
-            // TODO: this is where we check current output node estimation as well
             check_limits(
                 limits,
                 cost.num_nodes,
@@ -260,53 +268,21 @@ impl QueryLimitsChecker {
                             ));
                         }
 
-                        println!("Name: {}", f.node.name.node);
+                        let (current_count, is_connection) = estimate_output_nodes_for_curr_node(
+                            f,
+                            variables,
+                            parent_count,
+                            parent_is_connection,
+                        )
+                        .map_err(|_| {
+                            graphql_error_at_pos(
+                                BAD_USER_INPUT,
+                                "Unable to determine output nodes for current node",
+                                f.pos,
+                            )
+                        })?;
 
-                        let mut final_count = parent_count;
-                        let mut is_connection = false;
-                        let mut current_count = 1;
-
-                        // Process the current node as a Connection
-
-                        // If the current field is 'edges' or 'nodes' and parent_is_connection is false,
-                        // that means 'first' or 'last' were not provided and we should use the default_page_size
-                        if f.node.name.node == "edges" || f.node.name.node == "nodes" {
-                            if !parent_is_connection {
-                                current_count = 50; // TODO: set to default_page_size
-                                is_connection = true;
-                            }
-                        } else {
-                            // try to process the current node as a Connection
-                            let first_count = f
-                                .node
-                                .get_argument("first")
-                                .map(|arg| extract_end_count(arg, variables))
-                                .transpose()?;
-                            let last_count = f
-                                .node
-                                .get_argument("last")
-                                .map(|arg| extract_end_count(arg, variables))
-                                .transpose()?;
-
-                            // This follows the cursor spec for when both args are provided
-                            // the resulting slice is the min of the two
-                            let min_count = match (first_count, last_count) {
-                                (Some(first), Some(last)) => Some(std::cmp::min(first, last)),
-                                _ => first_count.or(last_count),
-                            };
-
-                            match min_count {
-                                Some(count) => {
-                                    current_count = count;
-                                    is_connection = true;
-                                }
-                                None => {
-                                    is_connection = false;
-                                }
-                            };
-                        }
-
-                        final_count *= current_count;
+                        let final_count = parent_count * current_count;
 
                         // Only update the "global" tally if this is a connection
                         if is_connection {
@@ -426,58 +402,109 @@ fn check_limits(
     Ok(())
 }
 
-fn extract_end_count(arg_value: &Positioned<GqlValue>, variables: &Variables) -> ServerResult<u64> {
-    match &arg_value.node {
-        GqlValue::Variable(var) => {
-            let result = variables.get(var).ok_or_else(|| {
-                graphql_error_at_pos(
-                    INTERNAL_SERVER_ERROR,
-                    "first or last argument must be a positive integer",
-                    arg_value.pos,
-                )
-            })?;
+/// Given a node, estimate the number of output nodes it will produce.
+/// Non-connection fields are ignored in this calculation.
+/// Values for output nodes are estimated by looking at the 'first' and 'last' args if provided,
+/// or by using the default_page_size if the current node is 'edges' or 'nodes'.
+fn estimate_output_nodes_for_curr_node(
+    f: &Positioned<Field>,
+    variables: &Variables,
+    parent_count: u64,
+    parent_is_connection: bool,
+) -> Result<(u64, bool), ParseQueryError> {
+    let mut current_count = 1;
+    let mut is_connection = false;
 
-            match result {
+    // If the current field is 'edges' or 'nodes', we are in a connection.
+    // If the parent connection has 'first' or 'last' set,
+    // we inherit that value by keeping the defaults.
+    if f.node.name.node == "edges" || f.node.name.node == "nodes" {
+        if !parent_is_connection {
+            current_count = 50; // TODO: set to default_page_size
+            is_connection = true;
+        }
+    } else {
+        // Check if the current node is a connection by checking if it has 'first' or 'last' selected as a field
+        let first_arg = f.node.get_argument("first");
+        let last_arg = f.node.get_argument("last");
+
+        match (first_arg, last_arg) {
+            (None, None) => { // no action needed
+            }
+            // A value was provided for 'first' or 'last' or both
+            _ => {
+                let (first_count, last_count) =
+                    get_end_values_from_fields(first_arg, last_arg, variables)?;
+
+                // This follows the cursor spec for when both args are provided
+                // the resulting slice is the min of the two
+                let min_count = match (first_count, last_count) {
+                    (Some(first), Some(last)) => Some(std::cmp::min(first, last)),
+                    _ => first_count.or(last_count),
+                };
+
+                match min_count {
+                    Some(count) => {
+                        current_count = count;
+                        is_connection = true;
+                    }
+                    None => {
+                        is_connection = false;
+                    }
+                };
+            }
+        }
+    }
+
+    Ok((current_count, is_connection))
+}
+
+/// Given a node, check its args for 'first' and 'last', and return the values as
+/// a tuple of u64 notating how many to select from either end.
+fn get_end_values_from_fields(
+    first: Option<&Positioned<GqlValue>>,
+    last: Option<&Positioned<GqlValue>>,
+    variables: &Variables,
+) -> Result<(Option<u64>, Option<u64>), ParseQueryError> {
+    let first_count = first.map(|arg| extract_value(arg, variables)).transpose()?;
+    let last_count = last.map(|arg| extract_value(arg, variables)).transpose()?;
+    Ok((first_count, last_count))
+}
+
+/// Extracts the numerical value from a GraphQL value.
+/// The input can be a variable or a number.
+/// Its corresponding value must be a valid 64.
+/// If the value is a variable, it will look up the value in the variables map.
+fn extract_value(
+    arg_value: &Positioned<GqlValue>,
+    variables: &Variables,
+) -> Result<u64, ParseQueryError> {
+    let end = match &arg_value.node {
+        GqlValue::Variable(var) => {
+            match variables
+                .get(var)
+                .ok_or_else(|| ParseQueryError::NotFound)?
+            {
                 Value::Number(num) => {
                     if !num.is_u64() {
-                        return Err(graphql_error_at_pos(
-                            INTERNAL_SERVER_ERROR,
-                            "first or last argument must be a positive integer",
-                            arg_value.pos,
-                        ));
+                        return Err(ParseQueryError::NotU64);
                     }
                     num.as_u64()
                 }
                 _ => {
-                    return Err(graphql_error_at_pos(
-                        INTERNAL_SERVER_ERROR,
-                        "first or last argument must be a positive integer",
-                        arg_value.pos,
-                    ));
+                    return Err(ParseQueryError::NotANumber);
                 }
             }
         }
         GqlValue::Number(num) => {
             if !num.is_u64() {
-                return Err(graphql_error_at_pos(
-                    INTERNAL_SERVER_ERROR,
-                    "first or last argument must be a positive integer",
-                    arg_value.pos,
-                ));
+                return Err(ParseQueryError::NotU64);
             }
             num.as_u64()
         }
         _ => {
-            return Err(graphql_error_at_pos(
-                INTERNAL_SERVER_ERROR,
-                "first or last argument must be a positive integer",
-                arg_value.pos,
-            ));
+            return Err(ParseQueryError::NotANumber);
         }
-    }
-    .ok_or(graphql_error_at_pos(
-        INTERNAL_SERVER_ERROR,
-        "first or last argument must be a positive integer",
-        arg_value.pos,
-    ))
+    };
+    end.ok_or(ParseQueryError::FailedToU64)
 }
