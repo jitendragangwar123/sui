@@ -92,7 +92,7 @@ impl ExtensionFactory for QueryLimitsChecker {
 struct ComponentCost {
     pub num_nodes: u32,
     pub depth: u32,
-    // pub output_nodes: u32
+    pub output_nodes: u64,
 }
 
 impl std::ops::Add for ComponentCost {
@@ -102,6 +102,7 @@ impl std::ops::Add for ComponentCost {
         Self {
             num_nodes: self.num_nodes + rhs.num_nodes,
             depth: self.depth + rhs.depth,
+            output_nodes: self.output_nodes + rhs.output_nodes,
         }
     }
 }
@@ -158,6 +159,7 @@ impl Extension for QueryLimitsChecker {
         let mut running_costs = ComponentCost {
             depth: 0,
             num_nodes: 0,
+            output_nodes: 0,
         };
         let mut max_depth_seen = 0;
 
@@ -222,20 +224,18 @@ impl QueryLimitsChecker {
         // Queue to store the nodes at each level
         let mut que = VecDeque::new();
 
-        let mut estimated_output_nodes: u64 = 0;
-
         for top_level_sel in sel_set.node.items.iter() {
             que.push_back((
                 top_level_sel,
-                /* estimated_output_nodes */ 1 as u64,
-                /* is_connection */ false,
+                /* parent_node_count */ 1 as u64,
+                /* parent_is_connection */ false,
             ));
             cost.num_nodes += 1;
             check_limits(
                 limits,
                 cost.num_nodes,
                 cost.depth,
-                estimated_output_nodes,
+                cost.output_nodes,
                 Some(top_level_sel.pos),
             )?;
         }
@@ -246,13 +246,7 @@ impl QueryLimitsChecker {
         while !que.is_empty() {
             // Signifies the start of a new level
             cost.depth += 1;
-            check_limits(
-                limits,
-                cost.num_nodes,
-                cost.depth,
-                estimated_output_nodes,
-                None,
-            )?;
+            check_limits(limits, cost.num_nodes, cost.depth, cost.output_nodes, None)?;
             while level_len > 0 {
                 // Ok to unwrap since we checked for empty queue
                 // and level_len > 0
@@ -268,26 +262,35 @@ impl QueryLimitsChecker {
                             ));
                         }
 
-                        let (current_count, is_connection) = estimate_output_nodes_for_curr_node(
-                            f,
-                            variables,
-                            parent_count,
-                            parent_is_connection,
-                        )
-                        .map_err(|_| {
-                            graphql_error_at_pos(
-                                BAD_USER_INPUT,
-                                "Unable to determine output nodes for current node",
-                                f.pos,
-                            )
-                        })?;
+                        println!("Current field: {}", f.node.name.node);
 
+                        let (current_count, is_connection) =
+                            estimate_output_nodes_for_curr_node(f, variables, parent_is_connection)
+                                .map_err(|_| {
+                                    graphql_error_at_pos(
+                                        BAD_USER_INPUT,
+                                        "Unable to determine output nodes for current node",
+                                        f.pos,
+                                    )
+                                })?;
+
+                        println!("Current count: {}", current_count);
+                        println!("Parent count: {}", parent_count);
                         let final_count = parent_count * current_count;
+                        println!("Final count: {}", final_count);
+                        println!("Parent is connection {}", parent_is_connection);
+                        println!("Is connection {}", is_connection);
+                        println!(
+                            "Estimated output nodes before update: {}",
+                            cost.output_nodes
+                        );
 
                         // Only update the "global" tally if this is a connection
                         if is_connection {
-                            estimated_output_nodes += final_count;
+                            cost.output_nodes += final_count;
                         }
+
+                        println!("Estimated output nodes after update: {}", cost.output_nodes);
 
                         for field_sel in f.node.selection_set.node.items.iter() {
                             que.push_back((field_sel, final_count, is_connection));
@@ -296,7 +299,7 @@ impl QueryLimitsChecker {
                                 limits,
                                 cost.num_nodes,
                                 cost.depth,
-                                estimated_output_nodes,
+                                cost.output_nodes,
                                 Some(field_sel.pos),
                             )?;
                         }
@@ -332,7 +335,7 @@ impl QueryLimitsChecker {
                                 limits,
                                 cost.num_nodes,
                                 cost.depth,
-                                estimated_output_nodes,
+                                cost.output_nodes,
                                 Some(frag_sel.pos),
                             )?;
                         }
@@ -353,7 +356,7 @@ impl QueryLimitsChecker {
                                 limits,
                                 cost.num_nodes,
                                 cost.depth,
-                                estimated_output_nodes,
+                                cost.output_nodes,
                                 Some(in_frag_sel.pos),
                             )?;
                         }
@@ -364,10 +367,10 @@ impl QueryLimitsChecker {
             level_len = que.len();
         }
 
-        if estimated_output_nodes < 1 {
-            estimated_output_nodes = 1;
+        if cost.output_nodes < 1 {
+            cost.output_nodes = 1;
         }
-        println!("Final estimated output nodes: {}", estimated_output_nodes);
+        println!("Final estimated output nodes: {}", cost.output_nodes);
         Ok(())
     }
 }
@@ -399,25 +402,31 @@ fn check_limits(
         ));
     }
 
+    if output_nodes > limits.max_output_nodes {
+        return Err(ServerError::new(
+            format!(
+                "Query will result in too many output nodes. The maximum allowed is {}, estimated {}",
+                limits.max_output_nodes, output_nodes
+            ),
+            pos,
+        ));
+    }
+
     Ok(())
 }
 
 /// Given a node, estimate the number of output nodes it will produce.
-/// Non-connection fields are ignored in this calculation.
-/// Values for output nodes are estimated by looking at the 'first' and 'last' args if provided,
-/// or by using the default_page_size if the current node is 'edges' or 'nodes'.
 fn estimate_output_nodes_for_curr_node(
     f: &Positioned<Field>,
     variables: &Variables,
-    parent_count: u64,
     parent_is_connection: bool,
 ) -> Result<(u64, bool), ParseQueryError> {
     let mut current_count = 1;
     let mut is_connection = false;
 
-    // If the current field is 'edges' or 'nodes', we are in a connection.
-    // If the parent connection has 'first' or 'last' set,
-    // we inherit that value by keeping the defaults.
+    // If the parent connection has 'first' or 'last' set, parent_is_connection is true.
+    // In that scenario, 'edges' and 'nodes' are normal, non-connection fields.
+    // Otherwise, this node is considered a connection and has count set to default_page_size.
     if f.node.name.node == "edges" || f.node.name.node == "nodes" {
         if !parent_is_connection {
             current_count = 50; // TODO: set to default_page_size
@@ -429,8 +438,7 @@ fn estimate_output_nodes_for_curr_node(
         let last_arg = f.node.get_argument("last");
 
         match (first_arg, last_arg) {
-            (None, None) => { // no action needed
-            }
+            (None, None) => { /* no action needed, use defaults */ }
             // A value was provided for 'first' or 'last' or both
             _ => {
                 let (first_count, last_count) =
