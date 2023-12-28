@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use std::{
+    collections::BTreeMap,
     fmt::{Debug, Display, Formatter, Write},
     path::PathBuf,
     sync::Arc,
@@ -9,7 +10,7 @@ use std::{
 
 use anyhow::{anyhow, ensure};
 use bip32::DerivationPath;
-use clap::*;
+use clap::{parser::ValuesRef, *};
 use colored::Colorize;
 use fastcrypto::{
     encoding::{Base64, Encoding},
@@ -369,46 +370,8 @@ pub enum SuiClientCommands {
     },
 
     /// Run a PTB either from file or from the provided args
-    PTB {
-        /// The path to the file containing the PTBs
-        file: Option<String>,
-        /// An input for the PTB, defined as the variable name and value. E.g., --input recipient 0x321...1231
-        #[clap(long, num_args(2))]
-        input: Option<Vec<String>>,
-        /// The object ID of the gas coin
-        #[clap(long)]
-        gas: String,
-        /// The gas budget to be used to execute this PTB
-        #[clap(long)]
-        gas_budget: u64,
-        /// Given n-values of the same type, it constructs a vector.
-        /// For non objects or an empty vector, the type tag must be specified.
-        #[clap(long, num_args(2..))]
-        make_move_vec: Option<Vec<String>>,
-        /// Merge N coins into the provided coin. E.g., merge-coins into_coin vector[coin1,coin2,coin3]
-        #[clap(long, num_args(2))]
-        merge_coins: Option<Vec<String>>,
-        /// Make a move call to a function
-        #[clap(long, num_args(2..))]
-        move_call: Option<Vec<String>>,
-        /// Split the coin into N coins as per the given amount. Bind the output to result.
-        /// E.g., --split-coins result=new_coins coin_to_split vector[amount].
-        /// On zsh, the vector needs to be given in quotes ("vector[amount,amount2]")
-        #[clap(long, num_args(2..5))]
-        split_coins: Option<Vec<String>>,
-        /// Transfer objects to the address. E.g., --transfer-objects to_address vector[obj]
-        #[clap(long, num_args(2..4))]
-        transfer_objects: Option<Vec<String>>,
-        /// Publish the move package. It takes as input the folder where the package exists.
-        #[clap(long)]
-        publish: Option<String>,
-        /// Upgrade the move package. It takes as input the folder where the package exists.
-        #[clap(long)]
-        upgrade: Option<String>,
-        /// Preview the PTB instead of executing it
-        #[clap(long)]
-        preview: bool,
-    },
+    #[clap(name = "ptb")]
+    PTB(PTB),
 
     /// Publish Move modules
     #[clap(name = "publish")]
@@ -681,6 +644,133 @@ pub enum SuiClientCommands {
         #[arg(long, short)]
         terminate_early: bool,
     },
+}
+
+#[derive(Parser, Debug)]
+pub struct PTB {
+    /// The path to the file containing the PTBs
+    #[clap(long, num_args(1))]
+    file: Option<String>,
+    /// An input for the PTB, defined as the variable name and value. E.g., --input recipient 0x321...1231
+    #[clap(long, num_args(1..3))]
+    assign: Vec<String>,
+    /// The object ID of the gas coin
+    #[clap(long)]
+    gas: String,
+    /// The gas budget to be used to execute this PTB
+    #[clap(long)]
+    gas_budget: u64,
+    /// Given n-values of the same type, it constructs a vector.
+    /// For non objects or an empty vector, the type tag must be specified.
+    #[clap(long, num_args(2..))]
+    make_move_vec: Vec<String>,
+    /// Merge N coins into the provided coin. E.g., merge-coins into_coin vector[coin1,coin2,coin3]
+    #[clap(long, num_args(2))]
+    merge_coins: Vec<String>,
+    /// Make a move call to a function
+    #[clap(long, num_args(2..))]
+    move_call: Vec<String>,
+    /// Split the coin into N coins as per the given amount. Bind the output to result.
+    /// E.g., --split-coins result=new_coins coin_to_split vector[amount].
+    /// On zsh, the vector needs to be given in quotes ("vector[amount,amount2]")
+    #[clap(long, num_args(2..5))]
+    split_coins: Vec<String>,
+    /// Transfer objects to the address. E.g., --transfer-objects to_address vector[obj]
+    #[clap(long, num_args(2..4))]
+    transfer_objects: Vec<String>,
+    /// Publish the move package. It takes as input the folder where the package exists.
+    #[clap(long, num_args(1))]
+    publish: Option<String>,
+    /// Upgrade the move package. It takes as input the folder where the package exists.
+    #[clap(long, num_args(1))]
+    upgrade: Option<String>,
+    // /// Preview the PTB instead of executing it
+    // #[clap(long)]
+    // preview: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct PTBCommand {
+    pub name: String,
+    pub values: Vec<String>,
+}
+
+impl PTB {
+    pub fn from_matches(matches: &ArgMatches) -> BTreeMap<usize, PTBCommand> {
+        let mut order = BTreeMap::new();
+        for arg_name in matches.ids() {
+            if matches.try_get_many::<clap::Id>(arg_name.as_str()).is_ok() {
+                continue;
+            }
+
+            // TODO
+            // we need to skip the --json flag as it is indicated
+            // the desired format for output
+            if arg_name.as_str() == "json" {
+                continue;
+            }
+
+            // TODO
+            if arg_name.as_str() == "preview" {
+                continue;
+            }
+
+            // TODO refactor the values stuff below to allow for u64, bool, and Strings
+            if arg_name.as_str() == "gas" || arg_name.as_str() == "gas_budget" {
+                // let val: ValuesRef<'_, u64> = matches.get_one("gas").unwrap();
+                continue;
+            }
+            let values: ValuesRef<'_, String> = matches.get_many(arg_name.as_str()).unwrap();
+
+            for (value, index) in values.zip(
+                matches
+                    .indices_of(arg_name.as_str())
+                    .expect("id came from matches"),
+            ) {
+                order.insert(
+                    index,
+                    PTBCommand {
+                        name: arg_name.to_string(),
+                        values: vec![value.to_string()],
+                    },
+                );
+            }
+        }
+        order
+    }
+    /// Builds a sequential list of ptb commands that should be fed into the parser
+    pub fn build_ptb_for_parsing(ptb: BTreeMap<usize, PTBCommand>) -> BTreeMap<usize, PTBCommand> {
+        // the ptb input is a list of commands  and values, where the key is the index
+        // of that value / command as it appearead in the args list on the CLI.
+        // A command can have multiple values, and these values will appear sequential
+        // with their indexes being consecutive (for that same command).
+        // If two or more keys are consecutive, it means it is the same command that has a
+        // number of values passed from the command line, so we need to build the list of values
+        // for that specific command.
+        let mut output = BTreeMap::<usize, PTBCommand>::new();
+
+        let mut curr_idx = 0;
+        let mut cmd_idx = 0;
+
+        for (idx, val) in ptb.iter() {
+            // the current value is for the current command we're building
+            // so add it to the output's value at key curr_idx
+            if idx == &(curr_idx + 1) {
+                output
+                    .get_mut(&cmd_idx)
+                    .unwrap()
+                    .values
+                    .extend(val.values.clone());
+                curr_idx += 1;
+            } else {
+                cmd_idx += 1;
+                output.insert(cmd_idx, val.clone());
+                curr_idx = *idx;
+            }
+        }
+
+        output
+    }
 }
 
 impl SuiClientCommands {
@@ -1389,25 +1479,12 @@ impl SuiClientCommands {
 
                 SuiClientCommandResult::VerifySource
             }
-            SuiClientCommands::PTB {
-                file,
-                input,
-                gas,
-                gas_budget,
-                make_move_vec,
-                merge_coins,
-                move_call,
-                split_coins,
-                transfer_objects,
-                publish,
-                upgrade,
-                preview,
-            } => {
-                println!("File {:?}", file);
-                println!("Input: {:?}", input);
-                println!("Merge coins: {:?}", merge_coins);
-                println!("Split coins: {:?}", split_coins);
-                println!("{:?}", make_move_vec);
+            SuiClientCommands::PTB(ptb) => {
+                // println!("File {:?}", file);
+                // println!("Input: {:?}", input);
+                // println!("Merge coins: {:?}", merge_coins);
+                // println!("Split coins: {:?}", split_coins);
+                // println!("{:?}", make_move_vec);
                 SuiClientCommandResult::RawObject(SuiObjectResponse::new(None, None))
             }
         });
