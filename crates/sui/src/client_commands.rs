@@ -695,31 +695,6 @@ pub struct PTBCommand {
     pub values: Vec<String>,
 }
 
-#[derive(Clone, PartialEq, Eq, Hash, Debug)]
-pub enum PTBValue {
-    Bool(bool),
-    String(String),
-    Int(u64),
-}
-
-impl From<String> for PTBValue {
-    fn from(other: String) -> Self {
-        Self::String(other)
-    }
-}
-
-impl From<bool> for PTBValue {
-    fn from(other: bool) -> Self {
-        Self::Bool(other)
-    }
-}
-
-impl From<u64> for PTBValue {
-    fn from(other: u64) -> Self {
-        Self::Int(other)
-    }
-}
-
 impl PTB {
     /// Get the matching arguments for this PTB and construct
     /// a map where the key is the index of this input argument,
@@ -754,41 +729,6 @@ impl PTB {
         }
         order
     }
-
-    // fn extract<T: Clone + Into<PTBValue> + Send + Sync + 'static>(
-    //     matches: &ArgMatches,
-    //     id: &clap::Id,
-    //     output: &mut BTreeMap<usize, PTBCommand>,
-    // ) -> bool {
-    //     match matches.try_get_many::<T>(id.as_str()) {
-    //         Ok(Some(values)) => {
-    //             for (value, index) in values.zip(
-    //                 matches
-    //                     .indices_of(id.as_str())
-    //                     .expect("id came from matches"),
-    //             ) {
-    //                 output.insert(
-    //                     index,
-    //                     PTBCommand {
-    //                         name: id.to_string(),
-    //                         values: vec![value.clone().into()],
-    //                     },
-    //                 );
-    //             }
-    //             true
-    //         }
-    //         Ok(None) => {
-    //             unreachable!("`ids` only reports what is present")
-    //         }
-    //         Err(clap::parser::MatchesError::UnknownArgument { .. }) => {
-    //             unreachable!("id came from matches")
-    //         }
-    //         Err(clap::parser::MatchesError::Downcast { .. }) => false,
-    //         Err(_) => {
-    //             unreachable!("id came from matches")
-    //         }
-    //     }
-    // }
 
     /// Builds a sequential list of ptb commands that should be fed into the parser
     pub fn build_ptb_for_parsing(ptb: BTreeMap<usize, PTBCommand>) -> BTreeMap<usize, PTBCommand> {

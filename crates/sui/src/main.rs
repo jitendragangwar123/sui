@@ -61,7 +61,7 @@ async fn main() {
         let json = ptb_args_matches.get_flag("json");
         let ptb = PTB::from_matches(ptb_args_matches);
         let commands = PTB::build_ptb_for_parsing(ptb);
-        println!("We got a PTB to parse");
+
         println!("{:?}", commands);
     } else {
         let args = Args::parse();
