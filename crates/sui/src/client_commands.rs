@@ -659,7 +659,7 @@ pub struct PTB {
     gas: String,
     /// The gas budget to be used to execute this PTB
     #[clap(long)]
-    gas_budget: u64,
+    gas_budget: String,
     /// Given n-values of the same type, it constructs a vector.
     /// For non objects or an empty vector, the type tag must be specified.
     #[clap(long, num_args(2..))]
@@ -684,42 +684,58 @@ pub struct PTB {
     /// Upgrade the move package. It takes as input the folder where the package exists.
     #[clap(long, num_args(1))]
     upgrade: Option<String>,
-    // /// Preview the PTB instead of executing it
-    // #[clap(long)]
-    // preview: bool,
+    /// Preview the PTB instead of executing it
+    #[clap(long)]
+    preview: bool,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
 pub struct PTBCommand {
     pub name: String,
     pub values: Vec<String>,
 }
 
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
+pub enum PTBValue {
+    Bool(bool),
+    String(String),
+    Int(u64),
+}
+
+impl From<String> for PTBValue {
+    fn from(other: String) -> Self {
+        Self::String(other)
+    }
+}
+
+impl From<bool> for PTBValue {
+    fn from(other: bool) -> Self {
+        Self::Bool(other)
+    }
+}
+
+impl From<u64> for PTBValue {
+    fn from(other: u64) -> Self {
+        Self::Int(other)
+    }
+}
+
 impl PTB {
+    /// Get the matching arguments for this PTB and construct
+    /// a map where the key is the index of this input argument,
+    /// and the value is the name of the arg, and the value passed
     pub fn from_matches(matches: &ArgMatches) -> BTreeMap<usize, PTBCommand> {
-        let mut order = BTreeMap::new();
+        let mut order = BTreeMap::<usize, PTBCommand>::new();
         for arg_name in matches.ids() {
             if matches.try_get_many::<clap::Id>(arg_name.as_str()).is_ok() {
                 continue;
             }
 
-            // TODO
-            // we need to skip the --json flag as it is indicated
-            // the desired format for output
-            if arg_name.as_str() == "json" {
+            // we need to skip the json and preview
+            if arg_name.as_str() == "json" || arg_name.as_str() == "preview" {
                 continue;
             }
 
-            // TODO
-            if arg_name.as_str() == "preview" {
-                continue;
-            }
-
-            // TODO refactor the values stuff below to allow for u64, bool, and Strings
-            if arg_name.as_str() == "gas" || arg_name.as_str() == "gas_budget" {
-                // let val: ValuesRef<'_, u64> = matches.get_one("gas").unwrap();
-                continue;
-            }
             let values: ValuesRef<'_, String> = matches.get_many(arg_name.as_str()).unwrap();
 
             for (value, index) in values.zip(
@@ -738,23 +754,56 @@ impl PTB {
         }
         order
     }
+
+    // fn extract<T: Clone + Into<PTBValue> + Send + Sync + 'static>(
+    //     matches: &ArgMatches,
+    //     id: &clap::Id,
+    //     output: &mut BTreeMap<usize, PTBCommand>,
+    // ) -> bool {
+    //     match matches.try_get_many::<T>(id.as_str()) {
+    //         Ok(Some(values)) => {
+    //             for (value, index) in values.zip(
+    //                 matches
+    //                     .indices_of(id.as_str())
+    //                     .expect("id came from matches"),
+    //             ) {
+    //                 output.insert(
+    //                     index,
+    //                     PTBCommand {
+    //                         name: id.to_string(),
+    //                         values: vec![value.clone().into()],
+    //                     },
+    //                 );
+    //             }
+    //             true
+    //         }
+    //         Ok(None) => {
+    //             unreachable!("`ids` only reports what is present")
+    //         }
+    //         Err(clap::parser::MatchesError::UnknownArgument { .. }) => {
+    //             unreachable!("id came from matches")
+    //         }
+    //         Err(clap::parser::MatchesError::Downcast { .. }) => false,
+    //         Err(_) => {
+    //             unreachable!("id came from matches")
+    //         }
+    //     }
+    // }
+
     /// Builds a sequential list of ptb commands that should be fed into the parser
     pub fn build_ptb_for_parsing(ptb: BTreeMap<usize, PTBCommand>) -> BTreeMap<usize, PTBCommand> {
         // the ptb input is a list of commands  and values, where the key is the index
         // of that value / command as it appearead in the args list on the CLI.
         // A command can have multiple values, and these values will appear sequential
-        // with their indexes being consecutive (for that same command).
-        // If two or more keys are consecutive, it means it is the same command that has a
-        // number of values passed from the command line, so we need to build the list of values
-        // for that specific command.
+        // with their indexes being consecutive (for that same command),
+        // so we need to build the list of values for that specific command.
         let mut output = BTreeMap::<usize, PTBCommand>::new();
-
         let mut curr_idx = 0;
         let mut cmd_idx = 0;
 
         for (idx, val) in ptb.iter() {
             // the current value is for the current command we're building
-            // so add it to the output's value at key curr_idx
+            // so add it to the output's value at key cmd_idx
             if idx == &(curr_idx + 1) {
                 output
                     .get_mut(&cmd_idx)
@@ -768,7 +817,6 @@ impl PTB {
                 curr_idx = *idx;
             }
         }
-
         output
     }
 }

@@ -57,6 +57,8 @@ async fn main() {
             .unwrap()
             .subcommand_matches("ptb")
             .unwrap();
+        let preview = ptb_args_matches.get_flag("preview");
+        let json = ptb_args_matches.get_flag("json");
         let ptb = PTB::from_matches(ptb_args_matches);
         let commands = PTB::build_ptb_for_parsing(ptb);
         println!("We got a PTB to parse");
