@@ -248,6 +248,12 @@ pub enum UserInputError {
 
     #[error("Immutable parameter provided, mutable parameter expected.")]
     MutableParameterExpected { object_id: ObjectID },
+
+    #[error("Address {address} is denied for coin defined in {coin_package_id:?}")]
+    AddressDeniedForCoin {
+        address: SuiAddress,
+        coin_package_id: ObjectID,
+    },
 }
 
 #[derive(
