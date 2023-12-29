@@ -646,6 +646,7 @@ pub enum SuiClientCommands {
     },
 }
 
+/// The ProgrammableTransactionBlock structure used in the CLI ptb command
 #[derive(Parser, Debug)]
 pub struct PTB {
     /// The path to the file containing the PTBs
@@ -658,21 +659,20 @@ pub struct PTB {
     #[clap(long)]
     gas: String,
     /// The gas budget to be used to execute this PTB
-    #[clap(long)]
-    gas_budget: String,
+    #[clap(long, default_value = "5000000")]
+    gas_budget: Option<String>,
     /// Given n-values of the same type, it constructs a vector.
     /// For non objects or an empty vector, the type tag must be specified.
     #[clap(long, num_args(2..))]
     make_move_vec: Vec<String>,
-    /// Merge N coins into the provided coin. E.g., merge-coins into_coin vector[coin1,coin2,coin3]
+    /// Merge N coins into the provided coin. E.g., merge-coins into_coin "[coin1,coin2,coin3]"
     #[clap(long, num_args(2))]
     merge_coins: Vec<String>,
     /// Make a move call to a function
     #[clap(long, num_args(2..))]
     move_call: Vec<String>,
-    /// Split the coin into N coins as per the given amount. Bind the output to result.
-    /// E.g., --split-coins result=new_coins coin_to_split vector[amount].
-    /// On zsh, the vector needs to be given in quotes ("vector[amount,amount2]")
+    /// Split the coin into N coins as per the given amount.
+    /// On zsh, the vector needs to be given in quotes ("[amount,amount2]")
     #[clap(long, num_args(2..5))]
     split_coins: Vec<String>,
     /// Transfer objects to the address. E.g., --transfer-objects to_address vector[obj]
@@ -696,10 +696,13 @@ pub struct PTBCommand {
 }
 
 impl PTB {
-    /// Get the matching arguments for this PTB and construct
-    /// a map where the key is the index of this input argument,
-    /// and the value is the name of the arg, and the value passed
-    pub fn from_matches(matches: &ArgMatches) -> BTreeMap<usize, PTBCommand> {
+    /// Get the passed arguments for this PTB and construct
+    /// a map where the key is the command index,
+    /// and the value is the name of the command and the values passed
+    /// This is ordered as per how it is given at the command line
+    pub fn from_matches(
+        matches: &ArgMatches,
+    ) -> Result<BTreeMap<usize, PTBCommand>, anyhow::Error> {
         let mut order = BTreeMap::<usize, PTBCommand>::new();
         for arg_name in matches.ids() {
             if matches.try_get_many::<clap::Id>(arg_name.as_str()).is_ok() {
@@ -711,7 +714,9 @@ impl PTB {
                 continue;
             }
 
-            let values: ValuesRef<'_, String> = matches.get_many(arg_name.as_str()).unwrap();
+            let values: ValuesRef<'_, String> = matches
+                .get_many(arg_name.as_str())
+                .ok_or_else(|| anyhow!("Cannot parse the args for the PTB"))?;
 
             for (value, index) in values.zip(
                 matches
@@ -727,7 +732,7 @@ impl PTB {
                 );
             }
         }
-        order
+        Ok(PTB::build_ptb_for_parsing(order))
     }
 
     /// Builds a sequential list of ptb commands that should be fed into the parser
@@ -758,6 +763,24 @@ impl PTB {
             }
         }
         output
+    }
+
+    pub async fn execute(matches: ArgMatches) -> Result<(), anyhow::Error> {
+        let ptb_args_matches = matches
+            .subcommand_matches("client")
+            .ok_or_else(|| anyhow!("Expected the client command but got a different command"))?
+            .subcommand_matches("ptb")
+            .ok_or_else(|| anyhow!("Expected the ptb subcommand but got a different command"))?;
+        let preview = ptb_args_matches.get_flag("preview");
+        let json = ptb_args_matches.get_flag("json");
+        let commands = PTB::from_matches(ptb_args_matches)?;
+        println!("{commands:?}");
+
+        let result = SuiClientCommandResult::PTB(PTBResult {
+            result: "ptb".to_string(),
+        });
+        result.print(json);
+        Ok(())
     }
 }
 
@@ -1467,14 +1490,9 @@ impl SuiClientCommands {
 
                 SuiClientCommandResult::VerifySource
             }
-            SuiClientCommands::PTB(ptb) => {
-                // println!("File {:?}", file);
-                // println!("Input: {:?}", input);
-                // println!("Merge coins: {:?}", merge_coins);
-                // println!("Split coins: {:?}", split_coins);
-                // println!("{:?}", make_move_vec);
-                SuiClientCommandResult::RawObject(SuiObjectResponse::new(None, None))
-            }
+            SuiClientCommands::PTB(_) => anyhow::bail!(
+                "Internal error: the PTB should have been handled in its own execute function."
+            ),
         });
         ret
     }
@@ -1856,6 +1874,7 @@ impl Display for SuiClientCommandResult {
             SuiClientCommandResult::ReplayTransaction => {}
             SuiClientCommandResult::ReplayBatch => {}
             SuiClientCommandResult::ReplayCheckpoints => {}
+            SuiClientCommandResult::PTB(_) => {} // this is handled in PTB execute
         }
         write!(f, "{}", writer.trim_end_matches('\n'))
     }
@@ -2098,6 +2117,11 @@ impl ObjectsOutput {
 }
 
 #[derive(Serialize)]
+pub struct PTBResult {
+    result: String,
+}
+
+#[derive(Serialize)]
 #[serde(untagged)]
 pub enum SuiClientCommandResult {
     ActiveAddress(Option<SuiAddress>),
@@ -2117,6 +2141,7 @@ pub enum SuiClientCommandResult {
     Pay(SuiTransactionBlockResponse),
     PayAllSui(SuiTransactionBlockResponse),
     PaySui(SuiTransactionBlockResponse),
+    PTB(PTBResult),
     Publish(SuiTransactionBlockResponse),
     RawObject(SuiObjectResponse),
     SerializedSignedTransaction(SenderSignedData),

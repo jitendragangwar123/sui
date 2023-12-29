@@ -51,18 +51,7 @@ async fn main() {
         .subcommand_matches("client")
         .is_some_and(|x| x.subcommand_matches("ptb").is_some())
     {
-        let matches = args.get_matches_mut();
-        let ptb_args_matches = matches
-            .subcommand_matches("client")
-            .unwrap()
-            .subcommand_matches("ptb")
-            .unwrap();
-        let preview = ptb_args_matches.get_flag("preview");
-        let json = ptb_args_matches.get_flag("json");
-        let ptb = PTB::from_matches(ptb_args_matches);
-        let commands = PTB::build_ptb_for_parsing(ptb);
-
-        println!("{:?}", commands);
+        exit_main!(PTB::execute(args.get_matches_mut()).await);
     } else {
         let args = Args::parse();
 
