@@ -109,7 +109,7 @@ impl ObjectState {
         match self {
             ObjectState::Active(_) => "Active",
             ObjectState::NotIndexed(_) => "NotIndexed",
-            ObjectState::DeletedOrWrapped => "DeletedOrWrapped",
+            ObjectState::WrappedOrDeleted => "WrappedOrDeleted",
             ObjectState::OutsideConsistentReadRange => "OutsideConsistentReadRange",
         }
     }
@@ -454,7 +454,6 @@ impl TryFrom<StoredHistoryObject> for Object {
 
     fn try_from(history_object: StoredHistoryObject) -> Result<Self, Error> {
         let address = addr(&history_object.object_id)?;
-
         if history_object.object_status == NativeObjectStatus::Active as i16 {
             let Some(serialized_object) = history_object.serialized_object else {
                 return Err(Error::Internal(format!(
