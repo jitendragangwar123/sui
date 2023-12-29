@@ -49,6 +49,7 @@ pub(crate) enum ObjectState {
     /// The object is wrapped or deleted and only partial information can be loaded from the indexer.
     WrappedOrDeleted,
     /// The requested object falls outside of the consistent read range supported by the indexer.
+    /// The requested object may or may not actually exist on-chain, but the data is not yet or no longer indexed.
     OutsideConsistentReadRange,
 }
 
@@ -121,6 +122,15 @@ impl Object {
         self.state.native().map(|native| native.version().value())
     }
 
+    /// The current status of the object as read from the off-chain store.
+    /// The possible states are:
+    /// - Active: The object is not deleted, wrapped, or outside the consistent read range, and the
+    /// object's contents can be loaded from the live objects or historical objects table.
+    /// - NotIndexed: The object's contents are available but not indexed yet. This is typically read from
+    /// the serialized contents of a transaction.
+    /// - WrappedOrDeleted: The object is deleted or wrapped and only partial information can be loaded from the indexer.
+    /// - OutsideConsistentReadRange: The requested object falls outside of the consistent read range supported by the indexer.
+    /// The requested object may or may not actually exist on-chain, but the data is not yet or no longer indexed.
     async fn status(&self) -> &str {
         self.state.status()
     }

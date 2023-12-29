@@ -25,7 +25,7 @@ use crate::{
         move_object::MoveObject,
         move_package::MovePackage,
         move_type::MoveType,
-        object::{Object, ObjectFilter},
+        object::{Object, ObjectFilter, ObjectState},
         protocol_config::{ProtocolConfigAttr, ProtocolConfigFeatureFlag, ProtocolConfigs},
         safe_mode::SafeMode,
         stake::StakedSui,
@@ -898,21 +898,41 @@ impl PgManager {
         address: SuiAddress,
         version: Option<u64>,
     ) -> Result<Option<Object>, Error> {
-        let address = address.into_vec();
+        let vec_addr = address.as_slice().to_vec();
         let version = version.map(|v| v as i64);
         println!("fetch_obj: address: {:?}, version: {:?}", address, version);
 
         match version {
-            Some(version) => self
-                .get_obj_at_version(address, version)
-                .await?
-                .map(Object::try_from)
-                .transpose(),
-            None => self
-                .get_obj(address)
-                .await?
-                .map(Object::try_from)
-                .transpose(),
+            Some(version) => {
+                let result = self.get_obj_at_version(vec_addr, version).await?;
+
+                match result {
+                    Some(historical_obj) => {
+                        let object = Object::try_from(historical_obj)?;
+                        Ok(Some(object))
+                    }
+                    None => Ok(Some(Object {
+                        address,
+                        state: ObjectState::OutsideConsistentReadRange,
+                        stored: None,
+                    })),
+                }
+            }
+            None => {
+                let result = self.get_obj(vec_addr).await?;
+
+                match result {
+                    Some(stored_obj) => {
+                        let object = Object::try_from(stored_obj)?;
+                        Ok(Some(object))
+                    }
+                    None => Ok(Some(Object {
+                        address,
+                        state: ObjectState::OutsideConsistentReadRange,
+                        stored: None,
+                    })),
+                }
+            }
         }
     }
 
