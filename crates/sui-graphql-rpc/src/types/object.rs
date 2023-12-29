@@ -105,15 +105,6 @@ impl ObjectState {
             ObjectState::OutsideConsistentReadRange => "OutsideConsistentReadRange",
         }
     }
-
-    pub(crate) fn status(&self) -> &str {
-        match self {
-            ObjectState::Active(_) => "Active",
-            ObjectState::NotIndexed(_) => "NotIndexed",
-            ObjectState::WrappedOrDeleted => "WrappedOrDeleted",
-            ObjectState::OutsideConsistentReadRange => "OutsideConsistentReadRange",
-        }
-    }
 }
 
 #[Object]
