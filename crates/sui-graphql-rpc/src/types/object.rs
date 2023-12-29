@@ -485,6 +485,36 @@ impl TryFrom<StoredHistoryObject> for Object {
     }
 }
 
+impl TryFrom<StoredHistoryObject> for Object {
+    type Error = Error;
+
+    fn try_from(history_object: StoredHistoryObject) -> Result<Self, Error> {
+        let address = addr(&history_object.object_id)?;
+        if history_object.object_status != ObjectStatus::Active as i16 {
+            return Err(Error::Internal(format!(
+                "Object {} at version {} is wrapped or deleted",
+                address, history_object.object_version
+            )));
+        }
+
+        let Some(serialized_object) = history_object.serialized_object else {
+            return Err(Error::Internal(format!(
+                "Active object {} at version {} cannot have missing serialized_object field",
+                address, history_object.object_version
+            )));
+        };
+
+        let native_object = bcs::from_bytes(&serialized_object)
+            .map_err(|_| Error::Internal(format!("Failed to deserialize object {address}")))?;
+
+        Ok(Self {
+            address,
+            stored: None,
+            native: native_object,
+        })
+    }
+}
+
 /// Parse a `SuiAddress` from its stored representation.  Failure is an internal error: the
 /// database should never contain a malformed address (containing the wrong number of bytes).
 fn addr(bytes: impl AsRef<[u8]>) -> Result<SuiAddress, Error> {
