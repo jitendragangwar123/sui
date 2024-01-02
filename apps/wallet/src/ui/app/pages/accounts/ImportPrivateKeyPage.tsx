@@ -3,7 +3,7 @@
 
 import { Text } from '_app/shared/text';
 import { validateExportedKeypair } from '_src/shared/utils/from-exported-keypair';
-import { ExportedKeypair } from '@mysten/sui.js/cryptography';
+import type { ExportedKeypair } from '@mysten/sui.js/cryptography';
 import { useNavigate } from 'react-router-dom';
 
 import { useAccountsFormContext } from '../../components/accounts/AccountsFormContext';

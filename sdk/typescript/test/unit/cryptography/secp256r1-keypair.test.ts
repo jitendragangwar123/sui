@@ -135,7 +135,11 @@ describe('secp256r1-keypair', () => {
 			// Keypair derived from bech32 string.
 			const { prefix, words } = bech32.decode(t[1]);
 			const raw = new Uint8Array(bech32.fromWords(words));
-			if (prefix != SUI_PRIVATE_KEY_PREFIX || raw[0] !== 2 || raw.length !== PRIVATE_KEY_SIZE + 1) {
+			if (
+				prefix !== SUI_PRIVATE_KEY_PREFIX ||
+				raw[0] !== 2 ||
+				raw.length !== PRIVATE_KEY_SIZE + 1
+			) {
 				throw new Error('invalid key');
 			}
 

@@ -101,7 +101,7 @@ export abstract class BaseSigner {
 export abstract class Keypair extends BaseSigner {
 	export(): ExportedKeypair {
 		const plainBytes = this.getSecretKeyBytes();
-		if (plainBytes.length != PRIVATE_KEY_SIZE) {
+		if (plainBytes.length !== PRIVATE_KEY_SIZE) {
 			throw new Error('Invwalid bytes length');
 		}
 		const flag = SIGNATURE_SCHEME_TO_FLAG[this.getKeyScheme()];

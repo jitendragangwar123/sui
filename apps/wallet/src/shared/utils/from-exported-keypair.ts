@@ -17,7 +17,7 @@ const LEGACY_PRIVATE_KEY_SIZE = 64;
 
 export function validateExportedKeypair(keypair: ExportedKeypair): ExportedKeypair {
 	const { prefix, words } = bech32.decode(keypair.privateKey);
-	if (prefix != SUI_PRIVATE_KEY_PREFIX) {
+	if (prefix !== SUI_PRIVATE_KEY_PREFIX) {
 		throw new Error('invalid key');
 	}
 	const extendedSecretKey = new Uint8Array(bech32.fromWords(words));
@@ -29,7 +29,7 @@ export function validateExportedKeypair(keypair: ExportedKeypair): ExportedKeypa
 
 export function fromExportedKeypair(keypair: ExportedKeypair): Keypair {
 	const { prefix, words } = bech32.decode(keypair.privateKey);
-	if (prefix != SUI_PRIVATE_KEY_PREFIX) {
+	if (prefix !== SUI_PRIVATE_KEY_PREFIX) {
 		throw new Error('invalid key');
 	}
 	const extendedSecretKey = new Uint8Array(bech32.fromWords(words));
