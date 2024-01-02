@@ -41,24 +41,22 @@ module Test::M1 {
 
 //# view-checkpoint
 
-
 //# advance-epoch 6
 
 //# view-checkpoint
 
 //# run-graphql
-
 {
   checkpoint {
     sequenceNumber
   }
 }
+
 //# create-checkpoint
 
 //# view-checkpoint
 
 //# run-graphql
-
 {
   checkpoint {
     sequenceNumber
@@ -66,7 +64,6 @@ module Test::M1 {
 }
 
 //# run-graphql --show-usage --show-headers --show-service-version
-
 {
   checkpoint {
     sequenceNumber
@@ -80,9 +77,9 @@ module Test::M1 {
 // Demonstrates using variables
 // If the variable ends in _opt, this is the optional variant
 
-//# run-graphql --variables A
+//# run-graphql
 {
-  address(address: $A) {
+  address(address: "@{A}") {
     objectConnection{
       edges {
         node {
@@ -95,9 +92,9 @@ module Test::M1 {
   }
 }
 
-//# run-graphql --variables Test A obj_2_0 validator_0
+//# run-graphql
 {
-  address(address: $Test) {
+  address(address: "@{Test}") {
     objectConnection{
       edges {
         node {
@@ -108,7 +105,7 @@ module Test::M1 {
       }
     }
   }
-  second: address(address: $A) {
+  second: address(address: "@{A}") {
     objectConnection{
       edges {
         node {
@@ -120,7 +117,7 @@ module Test::M1 {
     }
   }
 
-  val_objs: address(address: $validator_0) {
+  val_objs: address(address: "@{validator_0}") {
     objectConnection{
       edges {
         node {
@@ -135,7 +132,7 @@ module Test::M1 {
     }
   }
 
-  object(address: $obj_2_0) {
+  object(address: "@{obj_2_0}") {
     version
     owner {
       address
@@ -144,12 +141,7 @@ module Test::M1 {
 
 }
 
-
-//# view-graphql-variables
-// List all the graphql variables
-
-
-//# run-graphql --variables validator_0
+//# run-graphql
 {
   epoch {
     validatorSet {
@@ -160,7 +152,7 @@ module Test::M1 {
       }
     }
   }
-  address(address: $validator_0) {
+  address(address: "@{validator_0}") {
     address
   }
 }
