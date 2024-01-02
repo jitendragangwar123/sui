@@ -9,7 +9,9 @@ use crate::{TransactionalAdapter, ValidatorWithFullnode};
 use anyhow::{anyhow, bail};
 use async_trait::async_trait;
 use bimap::btree::BiBTreeMap;
+use fastcrypto::ed25519::Ed25519KeyPair;
 use fastcrypto::encoding::{Base64, Encoding};
+use fastcrypto::traits::ToFromBytes;
 use move_binary_format::CompiledModule;
 use move_bytecode_utils::module_cache::GetModule;
 use move_command_line_common::{
@@ -50,7 +52,7 @@ use sui_graphql_rpc::config::ConnectionConfig;
 use sui_graphql_rpc::test_infra::cluster::serve_executor;
 use sui_graphql_rpc::test_infra::cluster::ExecutorCluster;
 use sui_graphql_rpc::test_infra::cluster::DEFAULT_INTERNAL_DATA_SOURCE_PORT;
-use sui_json_rpc::api::QUERY_MAX_RESULT_LIMIT;
+use sui_json_rpc_api::QUERY_MAX_RESULT_LIMIT;
 use sui_json_rpc_types::{DevInspectResults, SuiExecutionStatus, SuiTransactionBlockEffectsAPI};
 use sui_protocol_config::{Chain, ProtocolConfig};
 use sui_rest_api::node_state_getter::NodeStateGetter;
@@ -98,6 +100,8 @@ pub enum FakeID {
     Known(ObjectID),
     Enumerated(u64, u64),
 }
+
+const DEFAULT_GAS_PRICE: u64 = 1_000;
 
 const WELL_KNOWN_OBJECTS: &[ObjectID] = &[
     MOVE_STDLIB_PACKAGE_ID,
@@ -193,44 +197,76 @@ impl<'a> MoveTestAdapter<'a> for SuiTestAdapter<'a> {
         );
 
         // Unpack the init arguments
-        let (additional_mapping, account_names, protocol_config, is_simulator) =
-            match task_opt.map(|t| t.command) {
-                Some((
-                    InitCommand { named_addresses },
-                    SuiInitArgs {
-                        accounts,
-                        protocol_version,
-                        max_gas,
-                        shared_object_deletion,
-                        simulator,
-                    },
-                )) => {
-                    let map = verify_and_create_named_address_mapping(named_addresses).unwrap();
-                    let accounts = accounts
-                        .map(|v| v.into_iter().collect::<BTreeSet<_>>())
-                        .unwrap_or_default();
+        let (
+            additional_mapping,
+            account_names,
+            protocol_config,
+            is_simulator,
+            custom_validator_account,
+            reference_gas_price,
+            default_gas_price,
+        ) = match task_opt.map(|t| t.command) {
+            Some((
+                InitCommand { named_addresses },
+                SuiInitArgs {
+                    accounts,
+                    protocol_version,
+                    max_gas,
+                    shared_object_deletion,
+                    simulator,
+                    custom_validator_account,
+                    reference_gas_price,
+                    default_gas_price,
+                },
+            )) => {
+                let map = verify_and_create_named_address_mapping(named_addresses).unwrap();
+                let accounts = accounts
+                    .map(|v| v.into_iter().collect::<BTreeSet<_>>())
+                    .unwrap_or_default();
 
-                    let mut protocol_config = if let Some(protocol_version) = protocol_version {
-                        ProtocolConfig::get_for_version(protocol_version.into(), Chain::Unknown)
-                    } else {
-                        ProtocolConfig::get_for_max_version_UNSAFE()
-                    };
-                    if let Some(enable) = shared_object_deletion {
-                        protocol_config.set_shared_object_deletion(enable);
-                    }
-                    if let Some(mx_tx_gas_override) = max_gas {
-                        if simulator {
-                            panic!("Cannot set max gas in simulator mode");
-                        }
-                        protocol_config.set_max_tx_gas_for_testing(mx_tx_gas_override)
-                    }
-                    (map, accounts, protocol_config, simulator)
+                let mut protocol_config = if let Some(protocol_version) = protocol_version {
+                    ProtocolConfig::get_for_version(protocol_version.into(), Chain::Unknown)
+                } else {
+                    ProtocolConfig::get_for_max_version_UNSAFE()
+                };
+                if let Some(enable) = shared_object_deletion {
+                    protocol_config.set_shared_object_deletion(enable);
                 }
-                None => {
-                    let protocol_config = ProtocolConfig::get_for_max_version_UNSAFE();
-                    (BTreeMap::new(), BTreeSet::new(), protocol_config, false)
+                if let Some(mx_tx_gas_override) = max_gas {
+                    if simulator {
+                        panic!("Cannot set max gas in simulator mode");
+                    }
+                    protocol_config.set_max_tx_gas_for_testing(mx_tx_gas_override)
                 }
-            };
+                if custom_validator_account && !simulator {
+                    panic!("Can only set custom validator account in simulator mode");
+                }
+                if reference_gas_price.is_some() && !simulator {
+                    panic!("Can only set reference gas price in simulator mode");
+                }
+                (
+                    map,
+                    accounts,
+                    protocol_config,
+                    simulator,
+                    custom_validator_account,
+                    reference_gas_price,
+                    default_gas_price,
+                )
+            }
+            None => {
+                let protocol_config = ProtocolConfig::get_for_max_version_UNSAFE();
+                (
+                    BTreeMap::new(),
+                    BTreeSet::new(),
+                    protocol_config,
+                    false,
+                    false,
+                    None,
+                    None,
+                )
+            }
+        };
 
         let (
             executor,
@@ -243,7 +279,15 @@ impl<'a> MoveTestAdapter<'a> for SuiTestAdapter<'a> {
             },
             cluster,
         ) = if is_simulator {
-            init_sim_executor(rng, account_names, additional_mapping, &protocol_config).await
+            init_sim_executor(
+                rng,
+                account_names,
+                additional_mapping,
+                &protocol_config,
+                custom_validator_account,
+                reference_gas_price,
+            )
+            .await
         } else {
             init_val_fullnode_executor(rng, account_names, additional_mapping, &protocol_config)
                 .await
@@ -271,7 +315,7 @@ impl<'a> MoveTestAdapter<'a> for SuiTestAdapter<'a> {
             object_enumeration: BiBTreeMap::new(),
             next_fake: (0, 0),
             // TODO: make this configurable
-            gas_price: 1000,
+            gas_price: default_gas_price.unwrap_or(DEFAULT_GAS_PRICE),
             staged_modules: BTreeMap::new(),
         };
 
@@ -310,6 +354,7 @@ impl<'a> MoveTestAdapter<'a> for SuiTestAdapter<'a> {
             sender,
             upgradeable,
             dependencies,
+            gas_price,
         } = extra;
         let named_addr_opt = modules.first().unwrap().named_address;
         let first_module_name = modules.first().unwrap().module.self_id().name().to_string();
@@ -333,7 +378,7 @@ impl<'a> MoveTestAdapter<'a> for SuiTestAdapter<'a> {
                 Ok(id)
             })
             .collect::<Result<_, _>>()?;
-        let gas_price = self.gas_price;
+        let gas_price = gas_price.unwrap_or(self.gas_price);
         // we are assuming that all packages depend on Move Stdlib and Sui Framework, so these
         // don't have to be provided explicitly as parameters
         dependencies.extend([MOVE_STDLIB_PACKAGE_ID, SUI_FRAMEWORK_PACKAGE_ID]);
@@ -501,6 +546,7 @@ impl<'a> MoveTestAdapter<'a> for SuiTestAdapter<'a> {
                 show_headers,
                 show_service_version,
                 variables,
+                cursors,
             }) => {
                 let file = data.ok_or_else(|| anyhow::anyhow!("Missing GraphQL query"))?;
                 let contents = std::fs::read_to_string(file.path())?;
@@ -510,11 +556,13 @@ impl<'a> MoveTestAdapter<'a> for SuiTestAdapter<'a> {
                     .wait_for_checkpoint_catchup(highest_checkpoint, Duration::from_secs(30))
                     .await;
 
+                let interpolated = self.interpolate_query(&contents, &cursors)?;
+
                 let used_variables = self.resolve_graphql_variables(&variables)?;
                 let resp = cluster
                     .graphql_client
                     .execute_to_graphql(
-                        contents.trim().to_owned(),
+                        interpolated.trim().to_owned(),
                         show_usage,
                         used_variables,
                         vec![],
@@ -618,6 +666,7 @@ impl<'a> MoveTestAdapter<'a> for SuiTestAdapter<'a> {
                 recipient,
                 sender,
                 gas_budget,
+                gas_price,
             }) => {
                 let mut builder = ProgrammableTransactionBuilder::new();
                 let obj_arg = SuiValue::Object(fake_id, None).into_argument(&mut builder, self)?;
@@ -626,7 +675,7 @@ impl<'a> MoveTestAdapter<'a> for SuiTestAdapter<'a> {
                     None => panic!("Unbound account {}", recipient),
                 };
                 let gas_budget = gas_budget.unwrap_or(DEFAULT_GAS_BUDGET);
-                let gas_price = self.gas_price;
+                let gas_price: u64 = gas_price.unwrap_or(self.gas_price);
                 let transaction = self.sign_txn(sender, |sender, gas| {
                     let rec_arg = builder.pure(recipient).unwrap();
                     builder.command(sui_types::transaction::Command::TransferObjects(
@@ -735,6 +784,7 @@ impl<'a> MoveTestAdapter<'a> for SuiTestAdapter<'a> {
                 gas_budget,
                 syntax,
                 policy,
+                gas_price,
             }) => {
                 let syntax = syntax.unwrap_or_else(|| self.default_syntax());
                 // zero out the package name
@@ -774,6 +824,7 @@ impl<'a> MoveTestAdapter<'a> for SuiTestAdapter<'a> {
                         );
                     original_package_addrs.push((*dep, dep_address));
                 }
+                let gas_price = gas_price.unwrap_or(self.gas_price);
 
                 let result = compile_any(
                     self,
@@ -817,6 +868,7 @@ impl<'a> MoveTestAdapter<'a> for SuiTestAdapter<'a> {
                             sender,
                             gas_budget,
                             policy,
+                            gas_price,
                         ).await?;
                         Ok((output, modules))
                     },
@@ -1039,13 +1091,77 @@ impl<'a> SuiTestAdapter<'a> {
                 res.push(var.clone());
             } else {
                 return Err(anyhow!(
-                    "Unknown variable: {}\nAllowed variable mappings are are {:#?}",
+                    "Unknown variable: {}\nAllowed variable mappings are {:#?}",
                     decl,
                     variables
                 ));
             }
         }
         Ok(res)
+    }
+
+    fn named_variables(&self, cursors: &[String]) -> BTreeMap<String, String> {
+        let mut variables = BTreeMap::new();
+        let named_addrs = self
+            .compiled_state
+            .named_address_mapping
+            .iter()
+            .map(|(name, addr)| (name.clone(), format!("{:#02x}", addr)));
+
+        let objects = self
+            .object_enumeration
+            .iter()
+            .filter_map(|(oid, fid)| match fid {
+                FakeID::Known(_) => None,
+                FakeID::Enumerated(x, y) => Some((format!("obj_{x}_{y}"), oid.to_string())),
+            });
+
+        let cursors = cursors
+            .iter()
+            .enumerate()
+            .map(|(idx, c)| (format!("cursor_{idx}"), Base64::encode(c)));
+
+        for (name, addr) in named_addrs.chain(objects).chain(cursors) {
+            let addr = addr.to_string();
+
+            // Required variant
+            variables.insert(name.to_owned(), addr.clone());
+            // Optional variant
+            let name = name.to_string() + "_opt";
+            variables.insert(name.clone(), addr.clone());
+        }
+        variables
+    }
+
+    fn interpolate_query(&self, contents: &str, cursors: &[String]) -> anyhow::Result<String> {
+        let variables = self.named_variables(cursors);
+        let mut interpolated_query = contents.to_string();
+
+        let re = regex::Regex::new(r"@\{([^\}]+)\}").unwrap();
+
+        let mut unique_vars = std::collections::HashSet::new();
+
+        // Collect unique variables
+        for cap in re.captures_iter(contents) {
+            if let Some(var_name) = cap.get(1) {
+                unique_vars.insert(var_name.as_str());
+            }
+        }
+
+        for var_name in unique_vars {
+            let Some(value) = variables.get(var_name) else {
+                return Err(anyhow!(
+                    "Unknown variable: {}\nAllowed variable mappings are {:#?}",
+                    var_name,
+                    variables
+                ));
+            };
+
+            let pattern = format!("@{{{}}}", var_name);
+            interpolated_query = interpolated_query.replace(&pattern, value);
+        }
+
+        Ok(interpolated_query)
     }
 
     async fn upgrade_package(
@@ -1057,6 +1173,7 @@ impl<'a> SuiTestAdapter<'a> {
         sender: String,
         gas_budget: Option<u64>,
         policy: u8,
+        gas_price: u64,
     ) -> anyhow::Result<Option<String>> {
         let modules_bytes = modules
             .iter()
@@ -1105,7 +1222,6 @@ impl<'a> SuiTestAdapter<'a> {
 
         let pt = builder.finish();
 
-        let gas_price = self.gas_price;
         let data = |sender, gas| {
             TransactionData::new_programmable(sender, vec![gas], pt, gas_budget, gas_price)
         };
@@ -1733,7 +1849,7 @@ async fn init_val_fullnode_executor(
         test_account
     };
 
-    // For each named Sui account without an address value, create an account with an adddress
+    // For each named Sui account without an address value, create an account with an address
     // and a gas object
     for n in account_names {
         let test_account = mk_account();
@@ -1772,6 +1888,8 @@ async fn init_sim_executor(
     account_names: BTreeSet<String>,
     additional_mapping: BTreeMap<String, NumericalAddress>,
     protocol_config: &ProtocolConfig,
+    custom_validator_account: bool,
+    reference_gas_price: Option<u64>,
 ) -> (
     Box<dyn TransactionalAdapter>,
     AccountSetup,
@@ -1793,6 +1911,19 @@ async fn init_sim_executor(
     // Make a default account keypair
     let default_account_kp = get_key_pair_from_rng(&mut rng);
 
+    let (mut validator_addr, mut validator_key, mut key_copy) = (None, None, None);
+    if custom_validator_account {
+        // Make a validator account with a gas object
+        let (a, b): (SuiAddress, Ed25519KeyPair) = get_key_pair_from_rng(&mut rng);
+
+        key_copy = Some(
+            Ed25519KeyPair::from_bytes(b.as_bytes())
+                .expect("FATAL: recovering key from bytes failed"),
+        );
+        validator_addr = Some(a);
+        validator_key = Some(b);
+    }
+
     let mut acc_cfgs = account_kps
         .values()
         .map(|acc| AccountConfig {
@@ -1805,6 +1936,13 @@ async fn init_sim_executor(
         gas_amounts: vec![GAS_FOR_TESTING],
     });
 
+    if let Some(v_addr) = validator_addr {
+        acc_cfgs.push(AccountConfig {
+            address: Some(v_addr),
+            gas_amounts: vec![GAS_FOR_TESTING],
+        });
+    }
+
     // Create the simulator with the specific account configs, which also crates objects
 
     let (sim, read_replica) = PersistedStore::new_sim_replica_with_protocol_version_and_accounts(
@@ -1812,6 +1950,8 @@ async fn init_sim_executor(
         DEFAULT_CHAIN_START_TIMESTAMP,
         protocol_config.version,
         acc_cfgs,
+        key_copy.map(|q| vec![q]),
+        reference_gas_price,
         None,
     );
 
@@ -1848,6 +1988,18 @@ async fn init_sim_executor(
         gas: o.id(),
     };
     objects.push(o.clone());
+
+    if let (Some(v_addr), Some(v_key)) = (validator_addr, validator_key) {
+        let o = sim.store().owned_objects(v_addr).next().unwrap();
+        let validator_account = TestAccount {
+            address: v_addr,
+            key_pair: v_key,
+            gas: o.id(),
+        };
+        objects.push(o.clone());
+        account_objects.insert("validator_0".to_string(), o.id());
+        accounts.insert("validator_0".to_string(), validator_account);
+    }
 
     let sim = Box::new(sim);
     update_named_address_mapping(
@@ -1899,8 +2051,14 @@ async fn update_named_address_mapping(
         }));
     // Extend the mappings of all named addresses with values
     for (name, addr) in additional_mapping {
-        if named_address_mapping.contains_key(&name) || name == "sui" {
-            panic!("Invalid init. The named address '{}' is reserved", name)
+        if (named_address_mapping.contains_key(&name)
+            && (named_address_mapping.get(&name) != Some(&addr)))
+            || name == "sui"
+        {
+            panic!(
+                "Invalid init. The named address '{}' is reserved or duplicated",
+                name
+            )
         }
         named_address_mapping.insert(name, addr);
     }

@@ -18,7 +18,7 @@ use crate::{
     },
     schema_v2::{
         address_metrics, checkpoints, display, epochs, events, move_call_metrics, objects,
-        packages, transactions,
+        objects_snapshot, packages, transactions,
     },
     types_v2::{IndexerResult, OwnerType},
     PgConnectionConfig, PgConnectionPoolConfig, PgPoolConnection,
@@ -389,6 +389,31 @@ impl IndexerReader {
         let system_state: SuiSystemStateSummary =
             sui_types::sui_system_state::get_sui_system_state(self)?
                 .into_sui_system_state_summary();
+        Ok(system_state)
+    }
+
+    /// Retrieve the system state data for the given epoch. If no epoch is given,
+    /// it will retrieve the latest epoch's data and return the system state.
+    /// System state of the an epoch is written at the end of the epoch, so system state
+    /// of the current epoch is empty until the epoch ends. You can call
+    /// `get_latest_sui_system_state` for current epoch instead.
+    pub fn get_epoch_sui_system_state(
+        &self,
+        epoch: Option<EpochId>,
+    ) -> Result<SuiSystemStateSummary, IndexerError> {
+        let stored_epoch = self.get_epoch_info_from_db(epoch)?;
+        let stored_epoch = match stored_epoch {
+            Some(stored_epoch) => stored_epoch,
+            None => return Err(IndexerError::InvalidArgumentError("Invalid epoch".into())),
+        };
+
+        let system_state: SuiSystemStateSummary = bcs::from_bytes(&stored_epoch.system_state)
+            .map_err(|_| {
+                IndexerError::PersistentStorageDataCorruptionError(format!(
+                    "Failed to deserialize `system_state` for epoch {:?}",
+                    epoch,
+                ))
+            })?;
         Ok(system_state)
     }
 
@@ -1636,6 +1661,31 @@ impl IndexerReader {
                     treasury_cap_obj_id
                 )))?;
         Ok(TreasuryCap::try_from(treasury_cap_obj_object)?.total_supply)
+    }
+
+    pub fn get_consistent_read_range(&self) -> Result<(i64, i64), IndexerError> {
+        let latest_checkpoint_sequence = self
+            .run_query(|conn| {
+                checkpoints::table
+                    .select(checkpoints::sequence_number)
+                    .order(checkpoints::sequence_number.desc())
+                    .first::<i64>(conn)
+                    .optional()
+            })?
+            .unwrap_or_default();
+        let latest_object_snapshot_checkpoint_sequence = self
+            .run_query(|conn| {
+                objects_snapshot::table
+                    .select(objects_snapshot::checkpoint_sequence_number)
+                    .order(objects_snapshot::checkpoint_sequence_number.desc())
+                    .first::<i64>(conn)
+                    .optional()
+            })?
+            .unwrap_or_default();
+        Ok((
+            latest_object_snapshot_checkpoint_sequence,
+            latest_checkpoint_sequence,
+        ))
     }
 }
 

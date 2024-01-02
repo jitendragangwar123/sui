@@ -90,26 +90,14 @@ Response: {
             "objectChanges": [
               {
                 "outputState": {
-                  "address": "0x02150ebfe3d017c2726bd482f6d3c8a63516a398d7d98e2ee69396764e04bc76",
-                  "asMovePackage": null
-                }
-              },
-              {
-                "outputState": {
-                  "address": "0x743464cf1eacc8f8f82cd5efe9232adc5339109ef831ce224b0b6381d29460ed",
-                  "asMovePackage": null
-                }
-              },
-              {
-                "outputState": {
-                  "address": "0xaba254bcf79dd861e7994b16b035bf89ee85d59275f700c8c0d7add3adb31c12",
+                  "address": "0x232c06bde547575096c1873563ba3fb6aa1db118bf18bfbbf47d919bdc6ec352",
                   "asMovePackage": {
                     "module": {
                       "function": {
                         "module": {
                           "package": {
                             "asObject": {
-                              "address": "0xaba254bcf79dd861e7994b16b035bf89ee85d59275f700c8c0d7add3adb31c12"
+                              "address": "0x232c06bde547575096c1873563ba3fb6aa1db118bf18bfbbf47d919bdc6ec352"
                             }
                           }
                         },
@@ -140,6 +128,18 @@ Response: {
                     }
                   }
                 }
+              },
+              {
+                "outputState": {
+                  "address": "0x6e94ac8e68db453c1a83cc2a9b28c6a007662566c0057289503b17220355ac51",
+                  "asMovePackage": null
+                }
+              },
+              {
+                "outputState": {
+                  "address": "0xd71890f67b1cda35c38847655c5120f99a78869275d0e736b6d63e4823187c99",
+                  "asMovePackage": null
+                }
               }
             ]
           }
@@ -167,20 +167,20 @@ Response: {
             "objectChanges": [
               {
                 "outputState": {
-                  "address": "0x02150ebfe3d017c2726bd482f6d3c8a63516a398d7d98e2ee69396764e04bc76",
+                  "address": "0x6e94ac8e68db453c1a83cc2a9b28c6a007662566c0057289503b17220355ac51",
                   "asMovePackage": null
                 }
               },
               {
                 "outputState": {
-                  "address": "0x3c522829dd3548215df55b28471de3d42e4c121a75ec44f35f60ebf2275115ee",
+                  "address": "0x913c290554a26371c2ec370665a064a6e17defc838d054ca96cc8a0c2a4e166a",
                   "asMovePackage": {
                     "module": {
                       "f": {
                         "module": {
                           "package": {
                             "asObject": {
-                              "address": "0x3c522829dd3548215df55b28471de3d42e4c121a75ec44f35f60ebf2275115ee"
+                              "address": "0x913c290554a26371c2ec370665a064a6e17defc838d054ca96cc8a0c2a4e166a"
                             }
                           }
                         },
@@ -212,7 +212,7 @@ Response: {
                         "module": {
                           "package": {
                             "asObject": {
-                              "address": "0x3c522829dd3548215df55b28471de3d42e4c121a75ec44f35f60ebf2275115ee"
+                              "address": "0x913c290554a26371c2ec370665a064a6e17defc838d054ca96cc8a0c2a4e166a"
                             }
                           }
                         },
@@ -233,7 +233,7 @@ Response: {
               },
               {
                 "outputState": {
-                  "address": "0x743464cf1eacc8f8f82cd5efe9232adc5339109ef831ce224b0b6381d29460ed",
+                  "address": "0xd71890f67b1cda35c38847655c5120f99a78869275d0e736b6d63e4823187c99",
                   "asMovePackage": null
                 }
               }
@@ -245,53 +245,62 @@ Response: {
   }
 }
 
-task 8 'run-graphql'. lines 134-166:
+task 8 'run-graphql'. lines 134-169:
 Response: {
   "data": {
     "object": {
       "asMovePackage": {
         "module": {
           "all": {
-            "nodes": [
+            "edges": [
               {
-                "name": "consensus_commit_prologue",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&mut 0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
-                  },
-                  {
-                    "repr": "u64"
-                  },
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNvbnNlbnN1c19jb21taXRfcHJvbG9ndWUi",
+                "node": {
+                  "name": "consensus_commit_prologue",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&mut 0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
+                    },
+                    {
+                      "repr": "u64"
+                    },
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               },
               {
-                "name": "create",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNyZWF0ZSI",
+                "node": {
+                  "name": "create",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               },
               {
-                "name": "timestamp_ms",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
-                  }
-                ],
-                "return": [
-                  {
-                    "repr": "u64"
-                  }
-                ]
+                "cursor": "InRpbWVzdGFtcF9tcyI",
+                "node": {
+                  "name": "timestamp_ms",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
+                    }
+                  ],
+                  "return": [
+                    {
+                      "repr": "u64"
+                    }
+                  ]
+                }
               }
             ],
             "pageInfo": {
@@ -300,30 +309,36 @@ Response: {
             }
           },
           "after": {
-            "nodes": [
+            "edges": [
               {
-                "name": "create",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNyZWF0ZSI",
+                "node": {
+                  "name": "create",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               },
               {
-                "name": "timestamp_ms",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
-                  }
-                ],
-                "return": [
-                  {
-                    "repr": "u64"
-                  }
-                ]
+                "cursor": "InRpbWVzdGFtcF9tcyI",
+                "node": {
+                  "name": "timestamp_ms",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
+                    }
+                  ],
+                  "return": [
+                    {
+                      "repr": "u64"
+                    }
+                  ]
+                }
               }
             ],
             "pageInfo": {
@@ -332,32 +347,38 @@ Response: {
             }
           },
           "before": {
-            "nodes": [
+            "edges": [
               {
-                "name": "consensus_commit_prologue",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&mut 0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
-                  },
-                  {
-                    "repr": "u64"
-                  },
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNvbnNlbnN1c19jb21taXRfcHJvbG9ndWUi",
+                "node": {
+                  "name": "consensus_commit_prologue",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&mut 0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
+                    },
+                    {
+                      "repr": "u64"
+                    },
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               },
               {
-                "name": "create",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNyZWF0ZSI",
+                "node": {
+                  "name": "create",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               }
             ],
             "pageInfo": {
@@ -371,23 +392,26 @@ Response: {
   }
 }
 
-task 9 'run-graphql'. lines 168-236:
+task 9 'run-graphql'. lines 171-242:
 Response: {
   "data": {
     "object": {
       "asMovePackage": {
         "module": {
           "prefix": {
-            "nodes": [
+            "edges": [
               {
-                "name": "create",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNyZWF0ZSI",
+                "node": {
+                  "name": "create",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               }
             ],
             "pageInfo": {
@@ -396,30 +420,36 @@ Response: {
             }
           },
           "prefixAll": {
-            "nodes": [
+            "edges": [
               {
-                "name": "create",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNyZWF0ZSI",
+                "node": {
+                  "name": "create",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               },
               {
-                "name": "timestamp_ms",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
-                  }
-                ],
-                "return": [
-                  {
-                    "repr": "u64"
-                  }
-                ]
+                "cursor": "InRpbWVzdGFtcF9tcyI",
+                "node": {
+                  "name": "timestamp_ms",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
+                    }
+                  ],
+                  "return": [
+                    {
+                      "repr": "u64"
+                    }
+                  ]
+                }
               }
             ],
             "pageInfo": {
@@ -428,30 +458,36 @@ Response: {
             }
           },
           "prefixExcess": {
-            "nodes": [
+            "edges": [
               {
-                "name": "create",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNyZWF0ZSI",
+                "node": {
+                  "name": "create",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               },
               {
-                "name": "timestamp_ms",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
-                  }
-                ],
-                "return": [
-                  {
-                    "repr": "u64"
-                  }
-                ]
+                "cursor": "InRpbWVzdGFtcF9tcyI",
+                "node": {
+                  "name": "timestamp_ms",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
+                    }
+                  ],
+                  "return": [
+                    {
+                      "repr": "u64"
+                    }
+                  ]
+                }
               }
             ],
             "pageInfo": {
@@ -460,16 +496,19 @@ Response: {
             }
           },
           "suffix": {
-            "nodes": [
+            "edges": [
               {
-                "name": "create",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNyZWF0ZSI",
+                "node": {
+                  "name": "create",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               }
             ],
             "pageInfo": {
@@ -478,32 +517,38 @@ Response: {
             }
           },
           "suffixAll": {
-            "nodes": [
+            "edges": [
               {
-                "name": "consensus_commit_prologue",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&mut 0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
-                  },
-                  {
-                    "repr": "u64"
-                  },
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNvbnNlbnN1c19jb21taXRfcHJvbG9ndWUi",
+                "node": {
+                  "name": "consensus_commit_prologue",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&mut 0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
+                    },
+                    {
+                      "repr": "u64"
+                    },
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               },
               {
-                "name": "create",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNyZWF0ZSI",
+                "node": {
+                  "name": "create",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               }
             ],
             "pageInfo": {
@@ -512,32 +557,38 @@ Response: {
             }
           },
           "suffixExcess": {
-            "nodes": [
+            "edges": [
               {
-                "name": "consensus_commit_prologue",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&mut 0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
-                  },
-                  {
-                    "repr": "u64"
-                  },
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNvbnNlbnN1c19jb21taXRfcHJvbG9ndWUi",
+                "node": {
+                  "name": "consensus_commit_prologue",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&mut 0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock"
+                    },
+                    {
+                      "repr": "u64"
+                    },
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               },
               {
-                "name": "create",
-                "typeParameters": [],
-                "parameters": [
-                  {
-                    "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
-                  }
-                ],
-                "return": []
+                "cursor": "ImNyZWF0ZSI",
+                "node": {
+                  "name": "create",
+                  "typeParameters": [],
+                  "parameters": [
+                    {
+                      "repr": "&0x0000000000000000000000000000000000000000000000000000000000000002::tx_context::TxContext"
+                    }
+                  ],
+                  "return": []
+                }
               }
             ],
             "pageInfo": {

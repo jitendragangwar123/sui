@@ -1,7 +1,7 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-use diesel::{Insertable, Queryable};
+use diesel::{Insertable, Queryable, Selectable};
 
 use crate::errors::IndexerError;
 use crate::schema_v2::epochs;
@@ -33,6 +33,35 @@ pub struct StoredEpochInfo {
     pub epoch_commitments: Option<Vec<u8>>,
 }
 
+#[derive(Queryable, Selectable)]
+#[diesel(table_name = epochs)]
+pub struct QueryableEpochInfo {
+    pub epoch: i64,
+    pub first_checkpoint_id: i64,
+    pub epoch_start_timestamp: i64,
+    pub reference_gas_price: i64,
+    pub protocol_version: i64,
+    pub total_stake: i64,
+    pub storage_fund_balance: i64,
+    pub epoch_total_transactions: Option<i64>,
+    pub last_checkpoint_id: Option<i64>,
+    pub epoch_end_timestamp: Option<i64>,
+    pub storage_fund_reinvestment: Option<i64>,
+    pub storage_charge: Option<i64>,
+    pub storage_rebate: Option<i64>,
+    pub stake_subsidy_amount: Option<i64>,
+    pub total_gas_fees: Option<i64>,
+    pub total_stake_rewards_distributed: Option<i64>,
+    pub leftover_storage_fund_inflow: Option<i64>,
+    pub epoch_commitments: Option<Vec<u8>>,
+}
+
+#[derive(Queryable)]
+pub struct QueryableEpochSystemState {
+    pub epoch: i64,
+    pub system_state: Vec<u8>,
+}
+
 impl StoredEpochInfo {
     pub fn from_epoch_beginning_info(e: &IndexedEpochInfo) -> Self {
         Self {
@@ -43,7 +72,6 @@ impl StoredEpochInfo {
             protocol_version: e.protocol_version as i64,
             total_stake: e.total_stake as i64,
             storage_fund_balance: e.storage_fund_balance as i64,
-            system_state: e.system_state.clone(),
             ..Default::default()
         }
     }
@@ -51,6 +79,7 @@ impl StoredEpochInfo {
     pub fn from_epoch_end_info(e: &IndexedEpochInfo) -> Self {
         Self {
             epoch: e.epoch as i64,
+            system_state: e.system_state.clone(),
             epoch_total_transactions: e.epoch_total_transactions.map(|v| v as i64),
             last_checkpoint_id: e.last_checkpoint_id.map(|v| v as i64),
             epoch_end_timestamp: e.epoch_end_timestamp.map(|v| v as i64),
@@ -76,7 +105,6 @@ impl StoredEpochInfo {
             protocol_version: 0,
             total_stake: 0,
             storage_fund_balance: 0,
-            system_state: vec![],
         }
     }
 }
@@ -125,15 +153,4 @@ impl TryFrom<StoredEpochInfo> for EpochInfo {
             reference_gas_price: Some(value.reference_gas_price as u64),
         })
     }
-}
-
-#[derive(Queryable)]
-pub struct EpochId {
-    pub id: i64,
-}
-
-#[derive(Queryable)]
-pub struct EpochSystemState {
-    pub epoch: i64,
-    pub system_state: Vec<u8>,
 }

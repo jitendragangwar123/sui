@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use async_graphql::{
-    connection::{Connection, Edge},
+    connection::{Connection, CursorType, Edge},
     *,
 };
 use sui_types::transaction::{
@@ -12,16 +12,22 @@ use sui_types::transaction::{
 };
 
 use crate::{
-    context_data::db_data_provider::{validate_cursor_pagination, PgManager},
-    error::Error,
+    context_data::db_data_provider::PgManager,
     types::{
-        base64::Base64, move_function::MoveFunction, move_type::MoveType, object::Object,
+        base64::Base64,
+        cursor::{Cursor, Page},
+        move_function::MoveFunction,
+        move_type::MoveType,
+        object_read::ObjectRead,
         sui_address::SuiAddress,
     },
 };
 
 #[derive(Clone, Eq, PartialEq)]
 pub(crate) struct ProgrammableTransactionBlock(pub NativeProgrammableTransactionBlock);
+
+pub(crate) type CInput = Cursor<usize>;
+pub(crate) type CTxn = Cursor<usize>;
 
 #[derive(Union, Clone, Eq, PartialEq)]
 enum TransactionInput {
@@ -33,13 +39,9 @@ enum TransactionInput {
 
 /// A Move object, either immutable, or owned mutable.
 #[derive(SimpleObject, Clone, Eq, PartialEq)]
-#[graphql(complex)]
 struct OwnedOrImmutable {
-    address: SuiAddress,
-    version: u64,
-    /// 32-byte hash that identifies the object's contents at this version, encoded as a Base58
-    /// string.
-    digest: String,
+    #[graphql(flatten)]
+    read: ObjectRead,
 }
 
 /// A Move object that's shared.
@@ -49,17 +51,18 @@ struct SharedInput {
     /// The version that this this object was shared at.
     initial_shared_version: u64,
     /// Controls whether the transaction block can reference the shared object as a mutable
-    /// reference or by value.
+    /// reference or by value. This has implications for scheduling: Transactions that just read
+    /// shared objects at a certain version (mutable = false) can be executed concurrently, while
+    /// transactions that write shared objects (mutable = true) must be executed serially with
+    /// respect to each other.
     mutable: bool,
 }
 
 /// A Move object that can be received in this transaction.
 #[derive(SimpleObject, Clone, Eq, PartialEq)]
-#[graphql(complex)]
 struct Receiving {
-    address: SuiAddress,
-    version: u64,
-    digest: String,
+    #[graphql(flatten)]
+    read: ObjectRead,
 }
 
 /// BCS encoded primitive value (not an object or Move struct).
@@ -194,153 +197,79 @@ struct TxResult {
 #[Object]
 impl ProgrammableTransactionBlock {
     /// Input objects or primitive values.
-    async fn input_connection(
+    async fn inputs(
         &self,
+        ctx: &Context<'_>,
         first: Option<u64>,
-        after: Option<String>,
+        after: Option<CInput>,
         last: Option<u64>,
-        before: Option<String>,
+        before: Option<CInput>,
     ) -> Result<Connection<String, TransactionInput>> {
-        // TODO: make cursor opaque (currently just an offset).
-        validate_cursor_pagination(&first, &after, &last, &before).extend()?;
+        let page = Page::from_params(ctx.data_unchecked(), first, after, last, before)?;
 
         let total = self.0.inputs.len();
-
-        let mut lo = if let Some(after) = after {
-            1 + after
-                .parse::<usize>()
-                .map_err(|_| Error::InvalidCursor("Failed to parse 'after' cursor.".to_string()))
-                .extend()?
-        } else {
-            0
-        };
-
-        let mut hi = if let Some(before) = before {
-            before
-                .parse::<usize>()
-                .map_err(|_| Error::InvalidCursor("Failed to parse 'before' cursor.".to_string()))
-                .extend()?
-        } else {
-            total
-        };
+        let mut lo = page.after().map_or(0, |a| *a + 1);
+        let mut hi = page.before().map_or(total, |b| *b);
 
         let mut connection = Connection::new(false, false);
         if hi <= lo {
             return Ok(connection);
-        }
-
-        // If there's a `first` limit, bound the upperbound to be at most `first` away from the
-        // lowerbound.
-        if let Some(first) = first {
-            let first = first as usize;
-            if hi - lo > first {
-                hi = lo + first;
-            }
-        }
-
-        // If there's a `last` limit, bound the lowerbound to be at most `last` away from the
-        // upperbound.  NB. This applies after we bounded the upperbound, using `first`.
-        if let Some(last) = last {
-            let last = last as usize;
-            if hi - lo > last {
-                lo = hi - last;
+        } else if (hi - lo) > page.limit() {
+            if page.is_from_front() {
+                hi = lo + page.limit();
+            } else {
+                lo = hi - page.limit();
             }
         }
 
         connection.has_previous_page = 0 < lo;
         connection.has_next_page = hi < total;
 
-        for (idx, input) in self.0.inputs.iter().enumerate().skip(lo).take(hi - lo) {
-            let input = TransactionInput::from(input.clone());
-            connection.edges.push(Edge::new(idx.to_string(), input));
+        for idx in lo..hi {
+            let input = TransactionInput::from(self.0.inputs[idx].clone());
+            let cursor = Cursor::new(idx).encode_cursor();
+            connection.edges.push(Edge::new(cursor, input));
         }
 
         Ok(connection)
     }
 
     /// The transaction commands, executed sequentially.
-    async fn transaction_connection(
+    async fn transactions(
         &self,
+        ctx: &Context<'_>,
         first: Option<u64>,
-        after: Option<String>,
+        after: Option<CTxn>,
         last: Option<u64>,
-        before: Option<String>,
+        before: Option<CTxn>,
     ) -> Result<Connection<String, ProgrammableTransaction>> {
-        // TODO: make cursor opaque (currently just an offset).
-        validate_cursor_pagination(&first, &after, &last, &before).extend()?;
+        let page = Page::from_params(ctx.data_unchecked(), first, after, last, before)?;
 
         let total = self.0.commands.len();
-
-        let mut lo = if let Some(after) = after {
-            1 + after
-                .parse::<usize>()
-                .map_err(|_| Error::InvalidCursor("Failed to parse 'after' cursor.".to_string()))
-                .extend()?
-        } else {
-            0
-        };
-
-        let mut hi = if let Some(before) = before {
-            before
-                .parse::<usize>()
-                .map_err(|_| Error::InvalidCursor("Failed to parse 'before' cursor.".to_string()))
-                .extend()?
-        } else {
-            total
-        };
+        let mut lo = page.after().map_or(0, |a| *a + 1);
+        let mut hi = page.before().map_or(total, |b| *b);
 
         let mut connection = Connection::new(false, false);
         if hi <= lo {
             return Ok(connection);
-        }
-
-        // If there's a `first` limit, bound the upperbound to be at most `first` away from the
-        // lowerbound.
-        if let Some(first) = first {
-            let first = first as usize;
-            if hi - lo > first {
-                hi = lo + first;
-            }
-        }
-
-        // If there's a `last` limit, bound the lowerbound to be at most `last` away from the
-        // upperbound.  NB. This applies after we bounded the upperbound, using `first`.
-        if let Some(last) = last {
-            let last = last as usize;
-            if hi - lo > last {
-                lo = hi - last;
+        } else if (hi - lo) > page.limit() {
+            if page.is_from_front() {
+                hi = lo + page.limit();
+            } else {
+                lo = hi - page.limit();
             }
         }
 
         connection.has_previous_page = 0 < lo;
         connection.has_next_page = hi < total;
 
-        for (idx, cmd) in self.0.commands.iter().enumerate().skip(lo).take(hi - lo) {
-            let input = ProgrammableTransaction::from(cmd.clone());
-            connection.edges.push(Edge::new(idx.to_string(), input));
+        for idx in lo..hi {
+            let txn = ProgrammableTransaction::from(self.0.commands[idx].clone());
+            let cursor = Cursor::new(idx).encode_cursor();
+            connection.edges.push(Edge::new(cursor, txn));
         }
 
         Ok(connection)
-    }
-}
-
-#[ComplexObject]
-impl OwnedOrImmutable {
-    async fn object(&self, ctx: &Context<'_>) -> Result<Option<Object>> {
-        ctx.data_unchecked::<PgManager>()
-            .fetch_obj(self.address, Some(self.version))
-            .await
-            .extend()
-    }
-}
-
-#[ComplexObject]
-impl Receiving {
-    async fn object(&self, ctx: &Context<'_>) -> Result<Option<Object>> {
-        ctx.data_unchecked::<PgManager>()
-            .fetch_obj(self.address, Some(self.version))
-            .await
-            .extend()
     }
 }
 
@@ -404,10 +333,8 @@ impl From<NativeCallArg> for TransactionInput {
                 bytes: Base64::from(bytes),
             }),
 
-            N::Object(O::ImmOrOwnedObject((id, v, d))) => I::OwnedOrImmutable(OwnedOrImmutable {
-                address: id.into(),
-                version: v.value(),
-                digest: d.base58_encode(),
+            N::Object(O::ImmOrOwnedObject(oref)) => I::OwnedOrImmutable(OwnedOrImmutable {
+                read: ObjectRead(oref),
             }),
 
             N::Object(O::SharedObject {
@@ -420,10 +347,8 @@ impl From<NativeCallArg> for TransactionInput {
                 mutable,
             }),
 
-            N::Object(O::Receiving((id, v, d))) => I::Receiving(Receiving {
-                address: id.into(),
-                version: v.value(),
-                digest: d.base58_encode(),
+            N::Object(O::Receiving(oref)) => I::Receiving(Receiving {
+                read: ObjectRead(oref),
             }),
         }
     }

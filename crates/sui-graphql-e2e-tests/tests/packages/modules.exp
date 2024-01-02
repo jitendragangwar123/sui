@@ -18,26 +18,26 @@ Response: {
             "objectChanges": [
               {
                 "outputState": {
-                  "address": "0x2a57a73b21597daafca2956736cfc004e55743c3f44a73e0d949fca0756a014f",
+                  "address": "0x52cf80120b0345307c0f09300dd5b27ae4f2ff46b8f11e6bee7f5bb9269eb32a",
+                  "asMovePackage": null
+                }
+              },
+              {
+                "outputState": {
+                  "address": "0xde1998d07504e61cd97532c5d233cbf7f7f5cbad19f5ef844aadcdd03c295491",
                   "asMovePackage": {
                     "module": {
                       "name": "m",
                       "package": {
                         "asObject": {
-                          "address": "0x2a57a73b21597daafca2956736cfc004e55743c3f44a73e0d949fca0756a014f"
+                          "address": "0xde1998d07504e61cd97532c5d233cbf7f7f5cbad19f5ef844aadcdd03c295491"
                         }
                       },
                       "fileFormatVersion": 6,
-                      "bytes": "oRzrCwYAAAAIAQAGAgYKAxARBCEEBSUfB0QiCGZADKYBMAAFAQMBBgEADAEAAQIBAgAABAABAQIAAgIBAAEHBQEBAAIEAAYCAwYLAAEJAAEDAQYLAAEIAQABCQABBgsAAQkAAQgBBENvaW4DU1VJA2JhcgRjb2luA2ZvbwFtA3N1aQV2YWx1ZSpXpzshWX2q/KKVZzbPwATlV0PD9Epz4NlJ/KB1agFPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAQAAAwULATgACwAWAgEBAAADCAYqAAAAAAAAAAoAOAEGKwAAAAAAAAALADgBGAIA",
-                      "disassembly": "// Move bytecode v6\nmodule 2a57a73b21597daafca2956736cfc004e55743c3f44a73e0d949fca0756a014f.m {\nuse 0000000000000000000000000000000000000000000000000000000000000002::coin;\nuse 0000000000000000000000000000000000000000000000000000000000000002::sui;\n\n\n\n\npublic foo<Ty0: drop>(Arg0: u64, Arg1: &Coin<Ty0>): u64 {\nB0:\n\t0: MoveLoc[1](Arg1: &Coin<Ty0>)\n\t1: Call coin::value<Ty0>(&Coin<Ty0>): u64\n\t2: MoveLoc[0](Arg0: u64)\n\t3: Add\n\t4: Ret\n}\npublic bar(Arg0: &Coin<SUI>): u64 {\nB0:\n\t0: LdU64(42)\n\t1: CopyLoc[0](Arg0: &Coin<SUI>)\n\t2: Call foo<SUI>(u64, &Coin<SUI>): u64\n\t3: LdU64(43)\n\t4: MoveLoc[0](Arg0: &Coin<SUI>)\n\t5: Call foo<SUI>(u64, &Coin<SUI>): u64\n\t6: Mul\n\t7: Ret\n}\n}"
+                      "bytes": "oRzrCwYAAAAIAQAGAgYKAxARBCEEBSUfB0QiCGZADKYBMAAFAQMBBgEADAEAAQIBAgAABAABAQIAAgIBAAEHBQEBAAIEAAYCAwYLAAEJAAEDAQYLAAEIAQABCQABBgsAAQkAAQgBBENvaW4DU1VJA2JhcgRjb2luA2ZvbwFtA3N1aQV2YWx1Zd4ZmNB1BOYc2XUyxdIzy/f39cutGfXvhEqtzdA8KVSRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAQAAAwULATgACwAWAgEBAAADCAYqAAAAAAAAAAoAOAEGKwAAAAAAAAALADgBGAIA",
+                      "disassembly": "// Move bytecode v6\nmodule de1998d07504e61cd97532c5d233cbf7f7f5cbad19f5ef844aadcdd03c295491.m {\nuse 0000000000000000000000000000000000000000000000000000000000000002::coin;\nuse 0000000000000000000000000000000000000000000000000000000000000002::sui;\n\n\n\n\npublic foo<Ty0: drop>(Arg0: u64, Arg1: &Coin<Ty0>): u64 {\nB0:\n\t0: MoveLoc[1](Arg1: &Coin<Ty0>)\n\t1: Call coin::value<Ty0>(&Coin<Ty0>): u64\n\t2: MoveLoc[0](Arg0: u64)\n\t3: Add\n\t4: Ret\n}\npublic bar(Arg0: &Coin<SUI>): u64 {\nB0:\n\t0: LdU64(42)\n\t1: CopyLoc[0](Arg0: &Coin<SUI>)\n\t2: Call foo<SUI>(u64, &Coin<SUI>): u64\n\t3: LdU64(43)\n\t4: MoveLoc[0](Arg0: &Coin<SUI>)\n\t5: Call foo<SUI>(u64, &Coin<SUI>): u64\n\t6: Mul\n\t7: Ret\n}\n}"
                     }
                   }
-                }
-              },
-              {
-                "outputState": {
-                  "address": "0xd904de69f0dfbe023c29f1635451fe45cbec244da66292c0977e06904134830d",
-                  "asMovePackage": null
                 }
               }
             ]
@@ -48,7 +48,7 @@ Response: {
   }
 }
 
-task 4 'run-graphql'. lines 65-97:
+task 4 'run-graphql'. lines 65-100:
 Response: {
   "data": {
     "transactionBlockConnection": {
@@ -58,18 +58,33 @@ Response: {
             "objectChanges": [
               {
                 "outputState": {
-                  "address": "0x2a57a73b21597daafca2956736cfc004e55743c3f44a73e0d949fca0756a014f",
+                  "address": "0x52cf80120b0345307c0f09300dd5b27ae4f2ff46b8f11e6bee7f5bb9269eb32a",
+                  "asMovePackage": null
+                }
+              },
+              {
+                "outputState": {
+                  "address": "0xde1998d07504e61cd97532c5d233cbf7f7f5cbad19f5ef844aadcdd03c295491",
                   "asMovePackage": {
                     "all": {
-                      "nodes": [
+                      "edges": [
                         {
-                          "name": "m"
+                          "cursor": "Im0i",
+                          "node": {
+                            "name": "m"
+                          }
                         },
                         {
-                          "name": "n"
+                          "cursor": "Im4i",
+                          "node": {
+                            "name": "n"
+                          }
                         },
                         {
-                          "name": "o"
+                          "cursor": "Im8i",
+                          "node": {
+                            "name": "o"
+                          }
                         }
                       ],
                       "pageInfo": {
@@ -78,12 +93,18 @@ Response: {
                       }
                     },
                     "after": {
-                      "nodes": [
+                      "edges": [
                         {
-                          "name": "n"
+                          "cursor": "Im4i",
+                          "node": {
+                            "name": "n"
+                          }
                         },
                         {
-                          "name": "o"
+                          "cursor": "Im8i",
+                          "node": {
+                            "name": "o"
+                          }
                         }
                       ],
                       "pageInfo": {
@@ -92,12 +113,18 @@ Response: {
                       }
                     },
                     "before": {
-                      "nodes": [
+                      "edges": [
                         {
-                          "name": "m"
+                          "cursor": "Im0i",
+                          "node": {
+                            "name": "m"
+                          }
                         },
                         {
-                          "name": "n"
+                          "cursor": "Im4i",
+                          "node": {
+                            "name": "n"
+                          }
                         }
                       ],
                       "pageInfo": {
@@ -106,12 +133,6 @@ Response: {
                       }
                     }
                   }
-                }
-              },
-              {
-                "outputState": {
-                  "address": "0xd904de69f0dfbe023c29f1635451fe45cbec244da66292c0977e06904134830d",
-                  "asMovePackage": null
                 }
               }
             ]
@@ -122,7 +143,7 @@ Response: {
   }
 }
 
-task 5 'run-graphql'. lines 99-134:
+task 5 'run-graphql'. lines 102-140:
 Response: {
   "data": {
     "transactionBlockConnection": {
@@ -132,12 +153,21 @@ Response: {
             "objectChanges": [
               {
                 "outputState": {
-                  "address": "0x2a57a73b21597daafca2956736cfc004e55743c3f44a73e0d949fca0756a014f",
+                  "address": "0x52cf80120b0345307c0f09300dd5b27ae4f2ff46b8f11e6bee7f5bb9269eb32a",
+                  "asMovePackage": null
+                }
+              },
+              {
+                "outputState": {
+                  "address": "0xde1998d07504e61cd97532c5d233cbf7f7f5cbad19f5ef844aadcdd03c295491",
                   "asMovePackage": {
                     "prefix": {
-                      "nodes": [
+                      "edges": [
                         {
-                          "name": "n"
+                          "cursor": "Im4i",
+                          "node": {
+                            "name": "n"
+                          }
                         }
                       ],
                       "pageInfo": {
@@ -146,12 +176,18 @@ Response: {
                       }
                     },
                     "prefixAll": {
-                      "nodes": [
+                      "edges": [
                         {
-                          "name": "n"
+                          "cursor": "Im4i",
+                          "node": {
+                            "name": "n"
+                          }
                         },
                         {
-                          "name": "o"
+                          "cursor": "Im8i",
+                          "node": {
+                            "name": "o"
+                          }
                         }
                       ],
                       "pageInfo": {
@@ -160,12 +196,18 @@ Response: {
                       }
                     },
                     "prefixExcess": {
-                      "nodes": [
+                      "edges": [
                         {
-                          "name": "n"
+                          "cursor": "Im4i",
+                          "node": {
+                            "name": "n"
+                          }
                         },
                         {
-                          "name": "o"
+                          "cursor": "Im8i",
+                          "node": {
+                            "name": "o"
+                          }
                         }
                       ],
                       "pageInfo": {
@@ -174,9 +216,12 @@ Response: {
                       }
                     },
                     "suffix": {
-                      "nodes": [
+                      "edges": [
                         {
-                          "name": "n"
+                          "cursor": "Im4i",
+                          "node": {
+                            "name": "n"
+                          }
                         }
                       ],
                       "pageInfo": {
@@ -185,12 +230,18 @@ Response: {
                       }
                     },
                     "suffixAll": {
-                      "nodes": [
+                      "edges": [
                         {
-                          "name": "m"
+                          "cursor": "Im0i",
+                          "node": {
+                            "name": "m"
+                          }
                         },
                         {
-                          "name": "n"
+                          "cursor": "Im4i",
+                          "node": {
+                            "name": "n"
+                          }
                         }
                       ],
                       "pageInfo": {
@@ -199,12 +250,18 @@ Response: {
                       }
                     },
                     "suffixExcess": {
-                      "nodes": [
+                      "edges": [
                         {
-                          "name": "m"
+                          "cursor": "Im0i",
+                          "node": {
+                            "name": "m"
+                          }
                         },
                         {
-                          "name": "n"
+                          "cursor": "Im4i",
+                          "node": {
+                            "name": "n"
+                          }
                         }
                       ],
                       "pageInfo": {
@@ -213,12 +270,6 @@ Response: {
                       }
                     }
                   }
-                }
-              },
-              {
-                "outputState": {
-                  "address": "0xd904de69f0dfbe023c29f1635451fe45cbec244da66292c0977e06904134830d",
-                  "asMovePackage": null
                 }
               }
             ]

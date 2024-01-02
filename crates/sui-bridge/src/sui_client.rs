@@ -4,15 +4,25 @@
 // TODO remove when integrated
 #![allow(unused)]
 
+use std::time::Duration;
+
 use anyhow::anyhow;
 use async_trait::async_trait;
 use axum::response::sse::Event;
 use ethers::types::{Address, U256};
 use serde::{Deserialize, Serialize};
-use sui_json_rpc_types::EventPage;
 use sui_json_rpc_types::{EventFilter, Page, SuiEvent};
+use sui_json_rpc_types::{
+    EventPage, SuiObjectDataOptions, SuiTransactionBlockResponse,
+    SuiTransactionBlockResponseOptions,
+};
 use sui_sdk::{SuiClient as SuiSdkClient, SuiClientBuilder};
+use sui_types::base_types::ObjectRef;
+use sui_types::error::UserInputError;
 use sui_types::event;
+use sui_types::gas_coin::GasCoin;
+use sui_types::object::Owner;
+use sui_types::transaction::Transaction;
 use sui_types::{
     base_types::{ObjectID, SuiAddress},
     digests::TransactionDigest,
@@ -20,10 +30,11 @@ use sui_types::{
     Identifier,
 };
 use tap::TapFallible;
+use tracing::warn;
 
 use crate::error::{BridgeError, BridgeResult};
 use crate::events::SuiBridgeEvent;
-use crate::types::BridgeCommittee;
+use crate::types::{BridgeAction, BridgeCommittee};
 
 pub struct SuiClient<P> {
     inner: P,
@@ -143,21 +154,21 @@ where
         }
     }
 
-    pub async fn get_bridge_events_by_tx_digest(
+    pub async fn get_bridge_action_by_tx_digest_and_event_idx(
         &self,
         tx_digest: &TransactionDigest,
-    ) -> BridgeResult<Vec<SuiBridgeEvent>> {
+        event_idx: u16,
+    ) -> BridgeResult<BridgeAction> {
         let events = self.inner.get_events_by_tx_digest(*tx_digest).await?;
-        let mut bridge_events = vec![];
-        for e in events {
-            let bridge_event = SuiBridgeEvent::try_from_sui_event(&e)?;
-            if let Some(bridge_event) = bridge_event {
-                bridge_events.push(bridge_event);
-            } else {
-                tracing::warn!("Observed non recognized Sui event: {:?}", e);
-            }
-        }
-        Ok(bridge_events)
+        let event = events
+            .get(event_idx as usize)
+            .ok_or(BridgeError::NoBridgeEventsInTxPosition)?;
+        let bridge_event = SuiBridgeEvent::try_from_sui_event(event)?
+            .ok_or(BridgeError::NoBridgeEventsInTxPosition)?;
+
+        bridge_event
+            .try_into_bridge_action(*tx_digest, event_idx)
+            .ok_or(BridgeError::BridgeEventNotActionable)
     }
 
     pub async fn get_bridge_committee(&self) -> BridgeResult<BridgeCommittee> {
@@ -165,6 +176,22 @@ where
             .get_bridge_committee()
             .await
             .map_err(|e| BridgeError::InternalError(format!("Can't get bridge committee: {e}")))
+    }
+
+    pub async fn execute_transaction_block_with_effects(
+        &self,
+        tx: sui_types::transaction::Transaction,
+    ) -> BridgeResult<SuiTransactionBlockResponse> {
+        self.inner.execute_transaction_block_with_effects(tx).await
+    }
+
+    pub async fn get_gas_data_panic_if_not_gas(
+        &self,
+        gas_object_id: ObjectID,
+    ) -> (GasCoin, ObjectRef, Owner) {
+        self.inner
+            .get_gas_data_panic_if_not_gas(gas_object_id)
+            .await
     }
 }
 
@@ -188,6 +215,16 @@ pub trait SuiClientInner: Send + Sync {
     async fn get_latest_checkpoint_sequence_number(&self) -> Result<u64, Self::Error>;
 
     async fn get_bridge_committee(&self) -> Result<BridgeCommittee, Self::Error>;
+
+    async fn execute_transaction_block_with_effects(
+        &self,
+        tx: Transaction,
+    ) -> Result<SuiTransactionBlockResponse, BridgeError>;
+
+    async fn get_gas_data_panic_if_not_gas(
+        &self,
+        gas_object_id: ObjectID,
+    ) -> (GasCoin, ObjectRef, Owner);
 }
 
 #[async_trait]
@@ -224,6 +261,47 @@ impl SuiClientInner for SuiSdkClient {
     async fn get_bridge_committee(&self) -> Result<BridgeCommittee, Self::Error> {
         unimplemented!()
     }
+
+    async fn execute_transaction_block_with_effects(
+        &self,
+        tx: Transaction,
+    ) -> Result<SuiTransactionBlockResponse, BridgeError> {
+        match self.quorum_driver_api().execute_transaction_block(
+            tx,
+            SuiTransactionBlockResponseOptions::new().with_effects(),
+            Some(sui_types::quorum_driver_types::ExecuteTransactionRequestType::WaitForEffectsCert),
+        ).await {
+            Ok(response) => Ok(response),
+            Err(e) => return Err(BridgeError::SuiTxFailureGeneric(e.to_string())),
+        }
+    }
+
+    async fn get_gas_data_panic_if_not_gas(
+        &self,
+        gas_object_id: ObjectID,
+    ) -> (GasCoin, ObjectRef, Owner) {
+        loop {
+            match self
+                .read_api()
+                .get_object_with_options(
+                    gas_object_id,
+                    SuiObjectDataOptions::default().with_owner(),
+                )
+                .await
+                .map(|resp| resp.data)
+            {
+                Ok(Some(gas_obj)) => {
+                    let owner = gas_obj.owner.expect("Owner is requested");
+                    let gas_coin = GasCoin::try_from(&gas_obj).expect("Not a gas coin");
+                    return (gas_coin, gas_obj.object_ref(), owner);
+                }
+                other => {
+                    warn!("Can't get gas object: {:?}: {:?}", gas_object_id, other);
+                    tokio::time::sleep(Duration::from_secs(5)).await;
+                }
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -231,7 +309,7 @@ mod tests {
     use crate::{
         events::EmittedSuiToEthTokenBridgeV1,
         sui_mock_client::SuiMockClient,
-        types::{BridgeChainId, TokenId},
+        types::{BridgeChainId, SuiToEthBridgeAction, TokenId},
     };
     use ethers::types::{
         Address, Block, BlockNumber, Filter, FilterBlockOption, Log, ValueOrArray, U64,
@@ -500,7 +578,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_bridge_events_by_tx_digest() {
+    async fn get_bridge_action_by_tx_digest_and_event_idx() {
         // Note: for random events generated in this test, we only care about
         // tx_digest and event_seq, so it's ok that package and module does
         // not match the query parameters.
@@ -523,14 +601,6 @@ mod tests {
         let mut sui_event_1 = SuiEvent::random_for_testing();
         sui_event_1.type_ = SuiToEthTokenBridgeV1.get().unwrap().clone();
         sui_event_1.bcs = bcs::to_bytes(&event_1).unwrap();
-        mock_client.add_events_by_tx_digest(tx_digest, vec![sui_event_1.clone()]);
-        assert_eq!(
-            sui_client
-                .get_bridge_events_by_tx_digest(&tx_digest)
-                .await
-                .unwrap(),
-            vec![SuiBridgeEvent::SuiToEthTokenBridgeV1(event_1.clone())],
-        );
 
         #[derive(Serialize, Deserialize)]
         struct RandomStruct {};
@@ -548,23 +618,50 @@ mod tests {
                 sui_event_1.clone(),
             ],
         );
-        // event_2 will be filtered
+        let mut expected_action_1 = BridgeAction::SuiToEthBridgeAction(SuiToEthBridgeAction {
+            sui_tx_digest: tx_digest,
+            sui_tx_event_index: 0,
+            sui_bridge_event: event_1.clone(),
+        });
         assert_eq!(
             sui_client
-                .get_bridge_events_by_tx_digest(&tx_digest)
+                .get_bridge_action_by_tx_digest_and_event_idx(&tx_digest, 0)
                 .await
                 .unwrap(),
-            vec![
-                SuiBridgeEvent::SuiToEthTokenBridgeV1(event_1.clone()),
-                SuiBridgeEvent::SuiToEthTokenBridgeV1(event_1)
-            ],
+            expected_action_1,
         );
+        let mut expected_action_2 = BridgeAction::SuiToEthBridgeAction(SuiToEthBridgeAction {
+            sui_tx_digest: tx_digest,
+            sui_tx_event_index: 2,
+            sui_bridge_event: event_1.clone(),
+        });
+        assert_eq!(
+            sui_client
+                .get_bridge_action_by_tx_digest_and_event_idx(&tx_digest, 2)
+                .await
+                .unwrap(),
+            expected_action_2,
+        );
+        assert!(matches!(
+            sui_client
+                .get_bridge_action_by_tx_digest_and_event_idx(&tx_digest, 1)
+                .await
+                .unwrap_err(),
+            BridgeError::NoBridgeEventsInTxPosition
+        ),);
+        assert!(matches!(
+            sui_client
+                .get_bridge_action_by_tx_digest_and_event_idx(&tx_digest, 3)
+                .await
+                .unwrap_err(),
+            BridgeError::NoBridgeEventsInTxPosition
+        ),);
 
         // if the StructTag matches with unparsable bcs, it returns an error
         sui_event_2.type_ = SuiToEthTokenBridgeV1.get().unwrap().clone();
         mock_client.add_events_by_tx_digest(tx_digest, vec![sui_event_2]);
         sui_client
-            .get_bridge_events_by_tx_digest(&tx_digest)
+            .get_bridge_action_by_tx_digest_and_event_idx(&tx_digest, 2)
             .await
             .unwrap_err();
     }
