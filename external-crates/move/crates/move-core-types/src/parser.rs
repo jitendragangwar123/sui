@@ -5,7 +5,7 @@
 use crate::{
     account_address::AccountAddress,
     identifier::{self, Identifier},
-    language_storage::{StructTag, TypeTag},
+    language_storage::{ModuleId, StructTag, TypeTag},
     transaction_argument::TransactionArgument,
 };
 use anyhow::{bail, format_err, Result};
@@ -290,6 +290,20 @@ impl<I: Iterator<Item = Token>> Parser<I> {
         })
     }
 
+    fn parse_address(&mut self) -> Result<AccountAddress> {
+        Ok(match self.next()? {
+            Token::Address(addr) => AccountAddress::from_hex_literal(&addr)?,
+            tok => bail!("unexpected token {:?}, expected address", tok),
+        })
+    }
+
+    fn parse_module_id(&mut self) -> Result<ModuleId> {
+        let address = self.parse_address()?;
+        self.consume(Token::ColonColon)?;
+        let module = Identifier::new(token_as_name(self.next()?)?)?;
+        Ok(ModuleId::new(address, module))
+    }
+
     fn parse_type_tag(&mut self) -> Result<TypeTag> {
         Ok(match self.next()? {
             Token::U8Type => TypeTag::U8,
@@ -380,6 +394,14 @@ pub fn parse_type_tags(s: &str) -> Result<Vec<TypeTag>> {
 
 pub fn parse_type_tag(s: &str) -> Result<TypeTag> {
     parse(s, |parser| parser.parse_type_tag())
+}
+
+pub fn parse_module_id(s: &str) -> Result<ModuleId> {
+    parse(s, |parser| parser.parse_module_id())
+}
+
+pub fn parse_address(s: &str) -> Result<AccountAddress> {
+    parse(s, |parser| parser.parse_address())
 }
 
 pub fn parse_transaction_arguments(s: &str) -> Result<Vec<TransactionArgument>> {

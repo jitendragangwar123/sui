@@ -21,13 +21,17 @@ gas summary: computation_cost: 1000000, storage_cost: 988000,  storage_rebate: 9
 task 4 'create-checkpoint'. lines 28-28:
 Checkpoint created: 1
 
-task 5 'run-graphql'. lines 30-50:
+task 5 'run-graphql'. lines 30-54:
 Response: {
   "data": {
-    "eventConnection": {
+    "events": {
+      "pageInfo": {
+        "hasPreviousPage": false,
+        "hasNextPage": false
+      },
       "edges": [
         {
-          "cursor": "2:0",
+          "cursor": "eyJ0eCI6MiwiZSI6MH0",
           "node": {
             "sendingModule": {
               "name": "M1"
@@ -47,7 +51,7 @@ Response: {
           }
         },
         {
-          "cursor": "3:0",
+          "cursor": "eyJ0eCI6MywiZSI6MH0",
           "node": {
             "sendingModule": {
               "name": "M1"
@@ -67,7 +71,7 @@ Response: {
           }
         },
         {
-          "cursor": "3:1",
+          "cursor": "eyJ0eCI6MywiZSI6MX0",
           "node": {
             "sendingModule": {
               "name": "M1"
@@ -91,13 +95,17 @@ Response: {
   }
 }
 
-task 6 'run-graphql'. lines 52-72:
+task 6 'run-graphql'. lines 56-80:
 Response: {
   "data": {
-    "eventConnection": {
+    "events": {
+      "pageInfo": {
+        "hasPreviousPage": true,
+        "hasNextPage": false
+      },
       "edges": [
         {
-          "cursor": "3:0",
+          "cursor": "eyJ0eCI6MywiZSI6MH0",
           "node": {
             "sendingModule": {
               "name": "M1"
@@ -117,7 +125,7 @@ Response: {
           }
         },
         {
-          "cursor": "3:1",
+          "cursor": "eyJ0eCI6MywiZSI6MX0",
           "node": {
             "sendingModule": {
               "name": "M1"
@@ -141,13 +149,17 @@ Response: {
   }
 }
 
-task 7 'run-graphql'. lines 74-94:
+task 7 'run-graphql'. lines 82-106:
 Response: {
   "data": {
-    "eventConnection": {
+    "events": {
+      "pageInfo": {
+        "hasPreviousPage": false,
+        "hasNextPage": true
+      },
       "edges": [
         {
-          "cursor": "2:0",
+          "cursor": "eyJ0eCI6MiwiZSI6MH0",
           "node": {
             "sendingModule": {
               "name": "M1"
@@ -167,7 +179,7 @@ Response: {
           }
         },
         {
-          "cursor": "3:0",
+          "cursor": "eyJ0eCI6MywiZSI6MH0",
           "node": {
             "sendingModule": {
               "name": "M1"
@@ -191,13 +203,17 @@ Response: {
   }
 }
 
-task 8 'run-graphql'. lines 96-116:
+task 8 'run-graphql'. lines 108-132:
 Response: {
   "data": {
-    "eventConnection": {
+    "events": {
+      "pageInfo": {
+        "hasPreviousPage": true,
+        "hasNextPage": false
+      },
       "edges": [
         {
-          "cursor": "3:0",
+          "cursor": "eyJ0eCI6MywiZSI6MH0",
           "node": {
             "sendingModule": {
               "name": "M1"
@@ -217,7 +233,7 @@ Response: {
           }
         },
         {
-          "cursor": "3:1",
+          "cursor": "eyJ0eCI6MywiZSI6MX0",
           "node": {
             "sendingModule": {
               "name": "M1"
