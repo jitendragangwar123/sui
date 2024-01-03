@@ -27,7 +27,7 @@ use prometheus::{
 };
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -76,6 +76,7 @@ use sui_storage::key_value_store::{TransactionKeyValueStore, TransactionKeyValue
 use sui_storage::key_value_store_metrics::KeyValueStoreMetrics;
 use sui_storage::IndexStore;
 use sui_types::authenticator_state::get_authenticator_state;
+use sui_types::coin_deny_list::CoinDenyList;
 use sui_types::committee::{EpochId, ProtocolVersion};
 use sui_types::crypto::{default_hash, AuthoritySignInfo, Signer};
 use sui_types::digests::ChainIdentifier;
@@ -747,9 +748,13 @@ impl AuthorityState {
             epoch_store.reference_gas_price(),
             tx_data,
             input_objects,
-            receiving_objects,
+            &receiving_objects,
             &self.metrics.bytecode_verifier_metrics,
         )?;
+
+        if epoch_store.protocol_config().enable_coin_deny_list() {
+            self.check_coin_deny(tx_data.sender(), &checked_input_objects, &receiving_objects)?;
+        }
 
         let owned_objects = checked_input_objects.inner().filter_owned_objects();
 
@@ -1488,7 +1493,7 @@ impl AuthorityState {
                     epoch_store.reference_gas_price(),
                     &transaction,
                     input_objects,
-                    receiving_objects,
+                    &receiving_objects,
                     &self.metrics.bytecode_verifier_metrics,
                 )?,
                 None,
@@ -4347,6 +4352,30 @@ impl AuthorityState {
             self.database.revert_state_update(&digest).await?;
         }
         info!("All uncommitted local transactions reverted");
+        Ok(())
+    }
+
+    fn check_coin_deny(
+        &self,
+        sender: SuiAddress,
+        input_objects: &CheckedInputObjects,
+        receiving_objects: &ReceivingObjects,
+    ) -> SuiResult {
+        let all_objects = input_objects
+            .inner()
+            .iter_objects()
+            .chain(receiving_objects.iter_objects());
+        let coin_type_package_ids = all_objects
+            .filter_map(|obj| {
+                obj.coin_type_maybe().map(|type_tag| match type_tag {
+                    TypeTag::Struct(struct_tag) => ObjectID::from_address(struct_tag.address),
+                    _ => {
+                        unreachable!("Coin template type must be a struct")
+                    }
+                })
+            })
+            .collect::<BTreeSet<_>>();
+        CoinDenyList::check_deny_list(sender, coin_type_package_ids, &self.database)?;
         Ok(())
     }
 

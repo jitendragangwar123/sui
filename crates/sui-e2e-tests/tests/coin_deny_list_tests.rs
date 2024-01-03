@@ -1,16 +1,25 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
+use std::path::PathBuf;
 use sui_core::authority::epoch_start_configuration::EpochStartConfigTrait;
+use sui_json_rpc_types::SuiTransactionBlockEffectsAPI;
 use sui_json_rpc_types::SuiTransactionBlockKind;
 use sui_json_rpc_types::{SuiTransactionBlockDataAPI, SuiTransactionBlockResponseOptions};
 use sui_macros::sim_test;
+use sui_types::base_types::{ObjectID, SequenceNumber, SuiAddress};
 use sui_types::coin_deny_list::{
-    get_coin_deny_list_obj_initial_shared_version, CoinDenyList, COIN_DENY_LIST_OBJECT_ID,
+    get_coin_deny_list_obj_initial_shared_version, CoinDenyList, FreezeCap, COIN_DENY_LIST_MODULE,
+    COIN_DENY_LIST_OBJECT_ID,
 };
+use sui_types::error::UserInputError;
 use sui_types::id::UID;
+use sui_types::object::Object;
 use sui_types::storage::ObjectStore;
-use test_cluster::TestClusterBuilder;
+use sui_types::transaction::{CallArg, ObjectArg};
+use sui_types::SUI_FRAMEWORK_PACKAGE_ID;
+use test_cluster::{TestCluster, TestClusterBuilder};
+use tracing::info;
 
 #[sim_test]
 async fn test_coin_deny_list_creation() {
@@ -98,4 +107,136 @@ async fn test_coin_deny_list_creation() {
             );
         });
     }
+}
+
+#[sim_test]
+async fn test_sender_denied_by_coin() {
+    let (test_cluster, test_context) = setup_and_publish_regulated_coin().await;
+    deny_address(&test_cluster, test_context.sender, &test_context).await;
+    let gas = test_cluster
+        .wallet
+        .get_one_gas_object_owned_by_address(test_context.sender)
+        .await
+        .unwrap()
+        .unwrap();
+    let tx_data = test_cluster
+        .test_transaction_builder_with_gas_object(test_context.sender, gas)
+        .await
+        .transfer(
+            test_context.new_coin.compute_object_reference(),
+            test_context.sender,
+        )
+        .build();
+    let tx = test_cluster.sign_transaction(&tx_data);
+    let result = test_cluster.wallet.execute_transaction_may_fail(tx).await;
+    let expected_error = UserInputError::AddressDeniedForCoin {
+        address: test_context.sender,
+        coin_package_id: test_context.coin_package,
+    };
+    assert!(result
+        .unwrap_err()
+        .to_string()
+        .contains(&expected_error.to_string()));
+}
+
+#[derive(Debug)]
+struct TestContext {
+    coin_deny_list_object_init_version: SequenceNumber,
+    coin_package: ObjectID,
+    new_coin: Object,
+    deny_cap_object: Object,
+    // Owner address of the new coin and deny cap object.
+    sender: SuiAddress,
+}
+
+// Returns the test cluster and the deny cap.
+async fn setup_and_publish_regulated_coin() -> (TestCluster, TestContext) {
+    let test_cluster = TestClusterBuilder::new().build().await;
+    let coin_deny_list_object_init_version = test_cluster
+        .fullnode_handle
+        .sui_node
+        .state()
+        .epoch_store_for_testing()
+        .epoch_start_config()
+        .coin_deny_list_obj_initial_shared_version()
+        .unwrap();
+    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    path.push("tests/move_test_code");
+    let tx_data = test_cluster
+        .test_transaction_builder()
+        .await
+        .publish(path)
+        .build();
+    let effects = test_cluster
+        .sign_and_execute_transaction(&tx_data)
+        .await
+        .effects
+        .unwrap();
+    let mut coin = None;
+    let mut deny_cap = None;
+    let mut coin_package = None;
+    for created in effects.created() {
+        let object = test_cluster
+            .get_object_from_fullnode_store(&created.object_id())
+            .await
+            .unwrap();
+        if object.is_package() {
+            coin_package = Some(object);
+            continue;
+        }
+        if object.is_immutable() {
+            continue;
+        }
+        if object.is_coin() {
+            coin = Some(object);
+        } else {
+            deny_cap = Some(object);
+        }
+    }
+    let new_coin = coin.unwrap();
+    let deny_cap_object = deny_cap.unwrap();
+    let coin_package = coin_package.unwrap();
+    let deny_cap = deny_cap_object.to_rust::<FreezeCap>().unwrap();
+    assert_eq!(deny_cap.package.bytes, coin_package.id());
+    let sender = deny_cap_object.owner.get_address_owner_address().unwrap();
+    let test_context = TestContext {
+        coin_deny_list_object_init_version,
+        coin_package: coin_package.id(),
+        new_coin,
+        deny_cap_object,
+        sender,
+    };
+    (test_cluster, test_context)
+}
+
+async fn deny_address(test_cluster: &TestCluster, address: SuiAddress, test_context: &TestContext) {
+    let gas = test_cluster
+        .wallet
+        .get_one_gas_object_owned_by_address(test_context.sender)
+        .await
+        .unwrap()
+        .unwrap();
+    let tx_data = test_cluster
+        .test_transaction_builder_with_gas_object(test_context.sender, gas)
+        .await
+        .move_call(
+            SUI_FRAMEWORK_PACKAGE_ID,
+            COIN_DENY_LIST_MODULE.as_str(),
+            "freeze_address",
+            vec![
+                CallArg::Object(ObjectArg::SharedObject {
+                    id: COIN_DENY_LIST_OBJECT_ID,
+                    initial_shared_version: test_context.coin_deny_list_object_init_version,
+                    mutable: true,
+                }),
+                CallArg::Object(ObjectArg::ImmOrOwnedObject(
+                    test_context.deny_cap_object.compute_object_reference(),
+                )),
+                CallArg::Pure(bcs::to_bytes(&address).unwrap()),
+            ],
+        )
+        .with_type_args(vec![test_context.new_coin.coin_type_maybe().unwrap()])
+        .build();
+    let response = test_cluster.sign_and_execute_transaction(&tx_data).await;
+    info!("Deny effects: {:?}", response.effects.unwrap());
 }

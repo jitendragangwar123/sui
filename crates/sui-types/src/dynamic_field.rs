@@ -251,12 +251,13 @@ pub fn derive_dynamic_field_id<T>(
 where
     T: Into<SuiAddress>,
 {
+    let parent: SuiAddress = parent.into();
     let k_tag_bytes = bcs::to_bytes(key_type_tag)?;
 
     // hash(parent || len(key) || key || key_type_tag)
     let mut hasher = DefaultHash::default();
     hasher.update([HashingIntentScope::ChildObjectId as u8]);
-    hasher.update(parent.into());
+    hasher.update(parent);
     hasher.update(key_bytes.len().to_le_bytes());
     hasher.update(key_bytes);
     hasher.update(k_tag_bytes);

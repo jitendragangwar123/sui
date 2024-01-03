@@ -13,6 +13,7 @@ use move_core_types::ident_str;
 use move_core_types::identifier::IdentStr;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
+use tracing::debug;
 
 pub const COIN_DENY_LIST_OBJECT_ID: ObjectID = ObjectID::from_address(coin_deny_list_addr());
 
@@ -49,45 +50,55 @@ pub struct CoinDenyList {
     pub frozen_addresses: Table,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct FreezeCap {
+    pub id: UID,
+    pub package: ID,
+}
+
 impl CoinDenyList {
     pub fn check_deny_list(
-        &self,
-        addresses: BTreeSet<SuiAddress>,
+        address: SuiAddress,
         coin_type_package_ids: BTreeSet<ObjectID>,
         object_store: &dyn ObjectStore,
     ) -> UserInputResult {
+        let deny_list_object = match object_store.get_object(&COIN_DENY_LIST_OBJECT_ID) {
+            Ok(Some(obj)) => obj,
+            _ => {
+                return Ok(());
+            }
+        };
+        // Unwrap safe because the deny list object is created by the system.
+        let deny_list: CoinDenyList = deny_list_object.to_rust().unwrap();
         // TODO: Add caches to avoid repeated DF reads.
-        let addresses: Vec<_> = addresses
-            .into_iter()
-            .filter(|address| {
-                let Ok(count) = get_dynamic_field_from_store::<SuiAddress, u64>(
-                    object_store,
-                    *self.id.object_id(),
-                    &address,
-                ) else {
-                    return false;
-                };
-                count != 0
-            })
-            .collect();
-        if addresses.is_empty() {
+        let Ok(count) = get_dynamic_field_from_store::<SuiAddress, u64>(
+            object_store,
+            deny_list.frozen_count.id,
+            &address,
+        ) else {
+            return Ok(());
+        };
+        if count == 0 {
             return Ok(());
         }
         for coin_package_id in coin_type_package_ids {
             let Ok(denied_addresses) = get_dynamic_field_from_store::<ID, VecSet<SuiAddress>>(
                 object_store,
-                *self.id.object_id(),
+                deny_list.frozen_addresses.id,
                 &ID::new(coin_package_id),
             ) else {
                 continue;
             };
-            for address in &addresses {
-                if denied_addresses.contents.contains(address) {
-                    return Err(UserInputError::AddressDeniedForCoin {
-                        address: *address,
-                        coin_package_id,
-                    });
-                }
+            let denied_addresses: BTreeSet<_> = denied_addresses.contents.into_iter().collect();
+            if denied_addresses.contains(&address) {
+                debug!(
+                    "Address {} is denied for coin package {}",
+                    address, coin_package_id
+                );
+                return Err(UserInputError::AddressDeniedForCoin {
+                    address,
+                    coin_package_id,
+                });
             }
         }
         Ok(())

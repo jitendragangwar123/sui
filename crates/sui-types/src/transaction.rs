@@ -2958,6 +2958,10 @@ impl InputObjects {
     pub fn iter(&self) -> impl Iterator<Item = &ObjectReadResult> {
         self.objects.iter()
     }
+
+    pub fn iter_objects(&self) -> impl Iterator<Item = &Object> {
+        self.objects.iter().filter_map(|o| o.as_object())
+    }
 }
 
 // Result of attempting to read a receiving object (currently only at signing time).
@@ -3010,6 +3014,10 @@ pub struct ReceivingObjects {
 impl ReceivingObjects {
     pub fn iter(&self) -> impl Iterator<Item = &ReceivingObjectReadResult> {
         self.objects.iter()
+    }
+
+    pub fn iter_objects(&self) -> impl Iterator<Item = &Object> {
+        self.objects.iter().filter_map(|o| o.object.as_object())
     }
 }
 
