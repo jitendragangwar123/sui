@@ -693,14 +693,13 @@ pub struct PTB {
     #[clap(long)]
     warn_shadows: bool,
     /// Pick gas budget strategy if multiple gas-budgets are provided.
-    #[clap(long, default_value_t, value_enum, required = false)]
+    #[clap(long, value_enum, required = false)]
     pick_gas: PTBGas,
 }
 
-#[derive(clap::ValueEnum, Clone, Default, Debug, Serialize)]
+#[derive(clap::ValueEnum, Clone, Debug, Serialize)]
 enum PTBGas {
     MIN,
-    #[default]
     MAX,
     SUM,
 }
