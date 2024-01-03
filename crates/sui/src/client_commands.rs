@@ -709,7 +709,7 @@ impl PTB {
                 continue;
             }
 
-            // we need to skip the json and preview
+            // we need to skip the json and preview as these are handled in the execute fn
             if arg_name.as_str() == "json" || arg_name.as_str() == "preview" {
                 continue;
             }
@@ -742,6 +742,8 @@ impl PTB {
         // A command can have multiple values, and these values will appear sequential
         // with their indexes being consecutive (for that same command),
         // so we need to build the list of values for that specific command.
+        // e.g., 1 [vals], 2 [vals], 4 [vals], 6 [vals], 1 + 2's value are
+        // for the same command, 4 and 6 are different commands
         let mut output = BTreeMap::<usize, PTBCommand>::new();
         let mut curr_idx = 0;
         let mut cmd_idx = 0;
