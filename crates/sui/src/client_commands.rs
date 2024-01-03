@@ -659,7 +659,7 @@ pub struct PTB {
     #[clap(long)]
     gas: String,
     /// The gas budget to be used to execute this PTB
-    #[clap(long, default_value = "5000000")]
+    #[clap(long)]
     gas_budget: Option<String>,
     /// Given n-values of the same type, it constructs a vector.
     /// For non objects or an empty vector, the type tag must be specified.
