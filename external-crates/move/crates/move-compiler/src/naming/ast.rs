@@ -698,6 +698,14 @@ impl Type_ {
         }
     }
 
+    pub fn unfold_to_builtin_type_name(&self) -> Option<&BuiltinTypeName> {
+        match self {
+            Type_::Apply(_, sp!(_, TypeName_::Builtin(b)), _) => Some(b),
+            Type_::Ref(_, inner) => return inner.value.unfold_to_builtin_type_name(),
+            _ => None,
+        }
+    }
+
     pub fn unfold_to_type_name(&self) -> Option<&TypeName> {
         match self {
             Type_::Apply(_, tn, _) => Some(tn),
