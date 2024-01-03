@@ -652,7 +652,7 @@ pub struct PTB {
     /// The path to the file containing the PTBs
     #[clap(long, num_args(1))]
     file: Option<String>,
-    /// An input for the PTB, defined as the variable name and value. E.g., --input recipient 0x321...1231
+    /// An input for the PTB, defined as the variable name and value, e.g: --input recipient 0x321
     #[clap(long, num_args(1..3))]
     assign: Vec<String>,
     /// The object ID of the gas coin
@@ -663,20 +663,21 @@ pub struct PTB {
     gas_budget: String,
     /// Given n-values of the same type, it constructs a vector.
     /// For non objects or an empty vector, the type tag must be specified.
+    /// For example, --make-move-vec "<u64>" "[]"
     #[clap(long, num_args(2))]
     make_move_vec: Vec<String>,
-    /// Merge N coins into the provided coin. E.g., merge-coins into_coin "[coin1,coin2,coin3]"
+    /// Merge N coins into the provided coin: --merge-coins into_coin "[coin1,coin2,coin3]"
     #[clap(long, num_args(2))]
     merge_coins: Vec<String>,
     /// Make a move call to a function
     #[clap(long, num_args(2..))]
     move_call: Vec<String>,
     /// Split the coin into N coins as per the given amount.
-    /// On zsh, the vector needs to be given in quotes ("[amount,amount2]")
-    #[clap(long, num_args(2..4))]
+    /// On zsh, the vector needs to be given in quotes: --split-coins coin_to_split "[amount1,amount2]"
+    #[clap(long, num_args(2))]
     split_coins: Vec<String>,
-    /// Transfer objects to the address. E.g., --transfer-objects to_address vector[obj]
-    #[clap(long, num_args(2..4))]
+    /// Transfer objects to the address. E.g., --transfer-objects to_address "[obj1, obj2]"
+    #[clap(long, num_args(2))]
     transfer_objects: Vec<String>,
     /// Publish the move package. It takes as input the folder where the package exists.
     #[clap(long, num_args(0..2), required=false)]
@@ -692,8 +693,8 @@ pub struct PTB {
     #[clap(long)]
     warn_shadows: bool,
     /// Pick gas budget strategy if multiple gas-budgets are provided.
-    #[clap(long, value_enum)]
-    pick_gas: Option<PTBGas>,
+    #[clap(long, default_value_t, value_enum, required = false)]
+    pick_gas: PTBGas,
 }
 
 #[derive(clap::ValueEnum, Clone, Default, Debug, Serialize)]
@@ -728,8 +729,8 @@ impl PTB {
             // TODO: do we want these as part of PTB command?
             if arg_name.as_str() == "json"
                 || arg_name.as_str() == "preview"
-                || arg_name.as_str() == "pick-gas"
-                || arg_name.as_str() == "warn-shadows"
+                || arg_name.as_str() == "pick_gas"
+                || arg_name.as_str() == "warn_shadows"
             {
                 continue;
             }
@@ -796,7 +797,8 @@ impl PTB {
         let preview = ptb_args_matches.get_flag("preview");
         let json = ptb_args_matches.get_flag("json");
         let warn_shadows = ptb_args_matches.get_flag("warn_shadows");
-        let pick_gas_budget = ptb_args_matches.get_flag("pick_gas");
+        let pick_gas_budget = ptb_args_matches.get_one::<PTBGas>("pick_gas");
+
         let commands = PTB::from_matches(ptb_args_matches)?;
         println!("{commands:?}");
 
