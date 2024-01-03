@@ -657,13 +657,13 @@ pub struct PTB {
     assign: Vec<String>,
     /// The object ID of the gas coin
     #[clap(long)]
-    gas: String,
+    gas: Option<String>,
     /// The gas budget to be used to execute this PTB
     #[clap(long)]
-    gas_budget: Option<String>,
+    gas_budget: String,
     /// Given n-values of the same type, it constructs a vector.
     /// For non objects or an empty vector, the type tag must be specified.
-    #[clap(long, num_args(2..))]
+    #[clap(long, num_args(2))]
     make_move_vec: Vec<String>,
     /// Merge N coins into the provided coin. E.g., merge-coins into_coin "[coin1,coin2,coin3]"
     #[clap(long, num_args(2))]
@@ -673,20 +673,35 @@ pub struct PTB {
     move_call: Vec<String>,
     /// Split the coin into N coins as per the given amount.
     /// On zsh, the vector needs to be given in quotes ("[amount,amount2]")
-    #[clap(long, num_args(2..5))]
+    #[clap(long, num_args(2..4))]
     split_coins: Vec<String>,
     /// Transfer objects to the address. E.g., --transfer-objects to_address vector[obj]
     #[clap(long, num_args(2..4))]
     transfer_objects: Vec<String>,
     /// Publish the move package. It takes as input the folder where the package exists.
-    #[clap(long, num_args(1))]
-    publish: Option<String>,
+    #[clap(long, num_args(0..2), required=false)]
+    publish: String,
     /// Upgrade the move package. It takes as input the folder where the package exists.
-    #[clap(long, num_args(1))]
-    upgrade: Option<String>,
+    #[clap(long, num_args(0..2), required=false)]
+    upgrade: String,
     /// Preview the PTB instead of executing it
     #[clap(long)]
     preview: bool,
+    /// Enable shadown warning when including other PTB files.
+    /// Off by default.
+    #[clap(long)]
+    warn_shadows: bool,
+    /// Pick gas budget strategy if multiple gas-budgets are provided.
+    #[clap(long, value_enum)]
+    pick_gas: Option<PTBGas>,
+}
+
+#[derive(clap::ValueEnum, Clone, Default, Debug, Serialize)]
+enum PTBGas {
+    MIN,
+    #[default]
+    MAX,
+    SUM,
 }
 
 #[derive(Clone, PartialEq, Eq, Hash, Debug)]
@@ -710,7 +725,12 @@ impl PTB {
             }
 
             // we need to skip the json and preview as these are handled in the execute fn
-            if arg_name.as_str() == "json" || arg_name.as_str() == "preview" {
+            // TODO: do we want these as part of PTB command?
+            if arg_name.as_str() == "json"
+                || arg_name.as_str() == "preview"
+                || arg_name.as_str() == "pick-gas"
+                || arg_name.as_str() == "warn-shadows"
+            {
                 continue;
             }
 
@@ -775,6 +795,8 @@ impl PTB {
             .ok_or_else(|| anyhow!("Expected the ptb subcommand but got a different command"))?;
         let preview = ptb_args_matches.get_flag("preview");
         let json = ptb_args_matches.get_flag("json");
+        let warn_shadows = ptb_args_matches.get_flag("warn_shadows");
+        let pick_gas_budget = ptb_args_matches.get_flag("pick_gas");
         let commands = PTB::from_matches(ptb_args_matches)?;
         println!("{commands:?}");
 
