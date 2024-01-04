@@ -176,7 +176,7 @@ impl Event {
 impl Target<EventKey> for StoredEvent {
     type Source = events::table;
 
-    fn filter_above<ST, GB>(cursor: &EventKey, query: Query<ST, GB>) -> Query<ST, GB> {
+    fn filter_ge<ST, GB>(cursor: &EventKey, query: Query<ST, GB>) -> Query<ST, GB> {
         use events::dsl::{event_sequence_number as event, tx_sequence_number as tx};
         query.filter(
             tx.gt(cursor.tx as i64)
@@ -184,7 +184,7 @@ impl Target<EventKey> for StoredEvent {
         )
     }
 
-    fn filter_below<ST, GB>(cursor: &EventKey, query: Query<ST, GB>) -> Query<ST, GB> {
+    fn filter_le<ST, GB>(cursor: &EventKey, query: Query<ST, GB>) -> Query<ST, GB> {
         use events::dsl::{event_sequence_number as event, tx_sequence_number as tx};
         query.filter(
             tx.lt(cursor.tx as i64)
