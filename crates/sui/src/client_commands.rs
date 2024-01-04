@@ -69,6 +69,11 @@ use tabled::{
 };
 use tracing::info;
 
+use crate::ptb_parser::{
+    command_token::CommandToken,
+    parser::{Argument, ParsedPTBCommand},
+};
+
 macro_rules! serialize_or_execute {
     ($tx_data:expr, $serialize_unsigned:expr, $serialize_signed:expr, $context:expr, $result_variant:ident) => {{
         assert!(
@@ -800,6 +805,11 @@ impl PTB {
 
         let commands = PTB::from_matches(ptb_args_matches)?;
         println!("{commands:?}");
+
+        for command in &commands {
+            let p = ParsedPTBCommand::parse(command.1)?;
+            println!("{:#?}", p)
+        }
 
         let result = SuiClientCommandResult::PTB(PTBResult {
             result: "ptb".to_string(),

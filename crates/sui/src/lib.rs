@@ -13,3 +13,4 @@ pub mod zklogin_commands_util;
 
 pub mod genesis_ceremony;
 pub mod genesis_inspector;
+pub mod ptb_parser;
