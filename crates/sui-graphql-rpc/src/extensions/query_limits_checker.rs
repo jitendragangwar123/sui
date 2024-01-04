@@ -3,9 +3,7 @@
 
 use crate::config::Limits;
 use crate::config::ServiceConfig;
-use crate::config::DEFAULT_PAGE_SIZE;
 use crate::error::code;
-use crate::error::code::BAD_USER_INPUT;
 use crate::error::code::INTERNAL_SERVER_ERROR;
 use crate::error::graphql_error;
 use crate::error::graphql_error_at_pos;
@@ -56,13 +54,6 @@ struct ValidationRes {
 #[derive(Debug, Default)]
 pub(crate) struct QueryLimitsChecker {
     validation_result: Mutex<Option<ValidationRes>>,
-}
-
-pub(crate) enum ParseQueryError {
-    NotFound,
-    NotU64,
-    NotANumber,
-    FailedToU64,
 }
 
 impl headers::Header for ShowUsage {
@@ -266,15 +257,12 @@ impl QueryLimitsChecker {
                             ));
                         }
 
-                        let (current_count, is_connection) =
-                            estimate_output_nodes_for_curr_node(f, variables, parent_is_connection)
-                                .map_err(|_| {
-                                    graphql_error_at_pos(
-                                        BAD_USER_INPUT,
-                                        "Unable to determine output nodes for current node",
-                                        f.pos,
-                                    )
-                                })?;
+                        let (current_count, is_connection) = estimate_output_nodes_for_curr_node(
+                            f,
+                            variables,
+                            parent_is_connection,
+                            limits,
+                        );
 
                         let final_count = parent_count * current_count;
 
@@ -410,7 +398,8 @@ fn estimate_output_nodes_for_curr_node(
     f: &Positioned<Field>,
     variables: &Variables,
     parent_is_connection: bool,
-) -> Result<(u64, bool), ParseQueryError> {
+    limits: &Limits,
+) -> (u64, bool) {
     let mut current_count = 1;
     let mut is_connection = false;
 
@@ -419,7 +408,7 @@ fn estimate_output_nodes_for_curr_node(
     // Otherwise, this node is considered a connection and has count set to default_page_size.
     if f.node.name.node == "edges" || f.node.name.node == "nodes" {
         if !parent_is_connection {
-            current_count = DEFAULT_PAGE_SIZE;
+            current_count = limits.default_page_size;
             is_connection = true;
         }
     } else {
@@ -427,82 +416,43 @@ fn estimate_output_nodes_for_curr_node(
         let first_arg = f.node.get_argument("first");
         let last_arg = f.node.get_argument("last");
 
-        match (first_arg, last_arg) {
-            (None, None) => { /* no action needed, use defaults */ }
-            // A value was provided for 'first' or 'last' or both
-            _ => {
-                let (first_count, last_count) =
-                    get_end_values_from_fields(first_arg, last_arg, variables)?;
+        let first_count = extract_limit(first_arg, variables).unwrap_or(limits.default_page_size);
+        let last_count = extract_limit(last_arg, variables).unwrap_or(limits.default_page_size);
 
+        match (first_arg, last_arg) {
+            (None, None) => { /* Not a connection, no further action required */ }
+            (Some(_), None) => {
+                current_count = first_count;
+            }
+            (None, Some(_)) => {
+                current_count = last_count;
+            }
+            (Some(_), Some(_)) => {
                 // This follows the cursor spec for when both args are provided
                 // the resulting slice is the min of the two
-                let min_count = match (first_count, last_count) {
-                    (Some(first), Some(last)) => Some(std::cmp::min(first, last)),
-                    _ => first_count.or(last_count),
-                };
-
-                match min_count {
-                    Some(count) => {
-                        current_count = count;
-                        is_connection = true;
-                    }
-                    None => {
-                        is_connection = false;
-                    }
-                };
+                current_count = std::cmp::min(first_count, last_count);
             }
         }
+        is_connection = true;
+    }
+    (current_count, is_connection)
+}
+
+/// Try to extract a u64 value from the given argument, or return None on failure.
+fn extract_limit(value: Option<&Positioned<GqlValue>>, variables: &Variables) -> Option<u64> {
+    let Some(value) = value else {
+        return None;
+    };
+
+    if let GqlValue::Variable(var) = &value.node {
+        return match variables.get(var) {
+            Some(Value::Number(num)) => num.as_u64(),
+            _ => None,
+        };
     }
 
-    Ok((current_count, is_connection))
-}
-
-/// Given a node, check its args for 'first' and 'last', and return the values as
-/// a tuple of u64 notating how many to select from either end.
-fn get_end_values_from_fields(
-    first: Option<&Positioned<GqlValue>>,
-    last: Option<&Positioned<GqlValue>>,
-    variables: &Variables,
-) -> Result<(Option<u64>, Option<u64>), ParseQueryError> {
-    let first_count = first.map(|arg| extract_value(arg, variables)).transpose()?;
-    let last_count = last.map(|arg| extract_value(arg, variables)).transpose()?;
-    Ok((first_count, last_count))
-}
-
-/// Extracts the numerical value from a GraphQL value.
-/// The input can be a variable or a number.
-/// Its corresponding value must be a valid 64.
-/// If the value is a variable, it will look up the value in the variables map.
-fn extract_value(
-    arg_value: &Positioned<GqlValue>,
-    variables: &Variables,
-) -> Result<u64, ParseQueryError> {
-    let end = match &arg_value.node {
-        GqlValue::Variable(var) => {
-            match variables
-                .get(var)
-                .ok_or_else(|| ParseQueryError::NotFound)?
-            {
-                Value::Number(num) => {
-                    if !num.is_u64() {
-                        return Err(ParseQueryError::NotU64);
-                    }
-                    num.as_u64()
-                }
-                _ => {
-                    return Err(ParseQueryError::NotANumber);
-                }
-            }
-        }
-        GqlValue::Number(num) => {
-            if !num.is_u64() {
-                return Err(ParseQueryError::NotU64);
-            }
-            num.as_u64()
-        }
-        _ => {
-            return Err(ParseQueryError::NotANumber);
-        }
+    let GqlValue::Number(value) = &value.node else {
+        return None;
     };
-    end.ok_or(ParseQueryError::FailedToU64)
+    value.as_u64()
 }
