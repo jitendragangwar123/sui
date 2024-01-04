@@ -141,7 +141,7 @@ mod tests {
             default_config.max_query_nodes
         );
         assert!(
-            max_output_nodes <= default_config.max_output_nodes as u64,
+            max_output_nodes <= default_config.max_output_nodes,
             "Max output nodes {} exceeds default limit {}",
             max_output_nodes,
             default_config.max_output_nodes
