@@ -56,6 +56,8 @@ pub(crate) struct QueryLimitsChecker {
     validation_result: Mutex<Option<ValidationRes>>,
 }
 
+pub(crate) const CONNECTION_FIELDS: [&str; 3] = ["edges", "nodes", "pageInfo"];
+
 impl headers::Header for ShowUsage {
     fn name() -> &'static HeaderName {
         &LIMITS_HEADER
@@ -215,16 +217,19 @@ impl QueryLimitsChecker {
         variables: &Variables,
     ) -> ServerResult<()> {
         // Use BFS to analyze the query and count the number of nodes and the depth of the query
+        struct ToVisit<'s> {
+            selection: &'s Positioned<Selection>,
+            parent_node_count: u64,
+        }
 
         // Queue to store the nodes at each level
         let mut que = VecDeque::new();
 
         for top_level_sel in sel_set.node.items.iter() {
-            que.push_back((
-                top_level_sel,
-                /* parent_node_count */ 1 as u64,
-                /* parent_is_connection */ false,
-            ));
+            que.push_back(ToVisit {
+                selection: top_level_sel,
+                parent_node_count: 1,
+            });
             cost.num_nodes += 1;
             check_limits(
                 limits,
@@ -245,7 +250,10 @@ impl QueryLimitsChecker {
             while level_len > 0 {
                 // Ok to unwrap since we checked for empty queue
                 // and level_len > 0
-                let (curr_sel, parent_count, parent_is_connection) = que.pop_front().unwrap();
+                let ToVisit {
+                    selection: curr_sel,
+                    parent_node_count,
+                } = que.pop_front().unwrap();
 
                 match &curr_sel.node {
                     Selection::Field(f) => {
@@ -257,22 +265,17 @@ impl QueryLimitsChecker {
                             ));
                         }
 
-                        let (current_count, is_connection) = estimate_output_nodes_for_curr_node(
-                            f,
-                            variables,
-                            parent_is_connection,
-                            limits,
-                        );
+                        let current_count =
+                            estimate_output_nodes_for_curr_node(f, variables, limits)
+                                * parent_node_count;
 
-                        let final_count = parent_count * current_count;
-
-                        // Only update the "global" tally if this is a connection
-                        if is_connection {
-                            cost.output_nodes += final_count;
-                        }
+                        cost.output_nodes += current_count;
 
                         for field_sel in f.node.selection_set.node.items.iter() {
-                            que.push_back((field_sel, final_count, is_connection));
+                            que.push_back(ToVisit {
+                                selection: field_sel,
+                                parent_node_count: current_count,
+                            });
                             cost.num_nodes += 1;
                             check_limits(
                                 limits,
@@ -308,7 +311,10 @@ impl QueryLimitsChecker {
                             ));
                         }
                         for frag_sel in frag_def.node.selection_set.node.items.iter() {
-                            que.push_back((frag_sel, parent_count, parent_is_connection));
+                            que.push_back(ToVisit {
+                                selection: frag_sel,
+                                parent_node_count,
+                            });
                             cost.num_nodes += 1;
                             check_limits(
                                 limits,
@@ -329,7 +335,10 @@ impl QueryLimitsChecker {
                             ));
                         }
                         for in_frag_sel in fs.node.selection_set.node.items.iter() {
-                            que.push_back((in_frag_sel, parent_count, parent_is_connection));
+                            que.push_back(ToVisit {
+                                selection: in_frag_sel,
+                                parent_node_count,
+                            });
                             cost.num_nodes += 1;
                             check_limits(
                                 limits,
@@ -346,9 +355,6 @@ impl QueryLimitsChecker {
             level_len = que.len();
         }
 
-        if cost.output_nodes < 1 {
-            cost.output_nodes = 1;
-        }
         Ok(())
     }
 }
@@ -397,45 +403,29 @@ fn check_limits(
 fn estimate_output_nodes_for_curr_node(
     f: &Positioned<Field>,
     variables: &Variables,
-    parent_is_connection: bool,
     limits: &Limits,
-) -> (u64, bool) {
+) -> u64 {
     let mut current_count = 1;
-    let mut is_connection = false;
 
-    // If the parent connection has 'first' or 'last' set, parent_is_connection is true.
-    // In that scenario, 'edges' and 'nodes' are normal, non-connection fields.
-    // Otherwise, this node is considered a connection and has count set to default_page_size.
-    if f.node.name.node == "edges" || f.node.name.node == "nodes" {
-        if !parent_is_connection {
-            current_count = limits.default_page_size;
-            is_connection = true;
-        }
-    } else {
-        // Check if the current node is a connection by checking if it has 'first' or 'last' selected as a field
+    if check_is_connection(f) {
+        // Set defaults for connection field
+
+        // If the args 'first' or 'last' is set, then we should use that as the count
         let first_arg = f.node.get_argument("first");
         let last_arg = f.node.get_argument("last");
 
         let first_count = extract_limit(first_arg, variables).unwrap_or(limits.default_page_size);
         let last_count = extract_limit(last_arg, variables).unwrap_or(limits.default_page_size);
 
-        match (first_arg, last_arg) {
-            (None, None) => { /* Not a connection, no further action required */ }
-            (Some(_), None) => {
-                current_count = first_count;
-            }
-            (None, Some(_)) => {
-                current_count = last_count;
-            }
-            (Some(_), Some(_)) => {
-                // This follows the cursor spec for when both args are provided
-                // the resulting slice is the min of the two
-                current_count = std::cmp::min(first_count, last_count);
-            }
-        }
-        is_connection = true;
+        current_count = match (first_arg, last_arg) {
+            (Some(_), None) => first_count,
+            (None, Some(_)) => last_count,
+            (Some(_), Some(_)) => std::cmp::min(first_count, last_count),
+            (None, None) => limits.default_page_size,
+        };
     }
-    (current_count, is_connection)
+
+    current_count
 }
 
 /// Try to extract a u64 value from the given argument, or return None on failure.
@@ -455,4 +445,17 @@ fn extract_limit(value: Option<&Positioned<GqlValue>>, variables: &Variables) ->
         return None;
     };
     value.as_u64()
+}
+
+/// Checks if the given field is a connection field by whether it has 'edges', 'nodes' or 'pageInfo' selected
+/// This should typically not require checking more than the first element of the selection set
+fn check_is_connection(f: &Positioned<Field>) -> bool {
+    for field_sel in f.node.selection_set.node.items.iter() {
+        if let Selection::Field(field) = &field_sel.node {
+            if CONNECTION_FIELDS.contains(&field.node.name.node.as_str()) {
+                return true;
+            }
+        }
+    }
+    false
 }
