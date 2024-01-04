@@ -694,7 +694,7 @@ pub struct PTB {
     warn_shadows: bool,
     /// Pick gas budget strategy if multiple gas-budgets are provided.
     #[clap(long, value_enum, required = false)]
-    pick_gas: PTBGas,
+    pick_gas_budget: PTBGas,
 }
 
 #[derive(clap::ValueEnum, Clone, Debug, Serialize)]
@@ -728,7 +728,7 @@ impl PTB {
             // TODO: do we want these as part of PTB command?
             if arg_name.as_str() == "json"
                 || arg_name.as_str() == "preview"
-                || arg_name.as_str() == "pick_gas"
+                || arg_name.as_str() == "pick_gas_budget"
                 || arg_name.as_str() == "warn_shadows"
             {
                 continue;
@@ -796,7 +796,7 @@ impl PTB {
         let preview = ptb_args_matches.get_flag("preview");
         let json = ptb_args_matches.get_flag("json");
         let warn_shadows = ptb_args_matches.get_flag("warn_shadows");
-        let pick_gas_budget = ptb_args_matches.get_one::<PTBGas>("pick_gas");
+        let pick_gas_budget = ptb_args_matches.get_one::<PTBGas>("pick_gas_budget");
 
         let commands = PTB::from_matches(ptb_args_matches)?;
         println!("{commands:?}");
