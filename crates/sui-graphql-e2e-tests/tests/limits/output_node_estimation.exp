@@ -1,4 +1,4 @@
-processed 12 tasks
+processed 13 tasks
 
 task 1 'run-graphql'. lines 6-16:
 Response: {
@@ -6,8 +6,143 @@ Response: {
     "transactionBlockConnection": {
       "edges": [
         {
-          "txns": {
-            "digest": "B1KYYSB4zrvbhMKvyHFgFhXcEECE72N7nvqrsJfNLX1z"
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
           }
         }
       ]
@@ -16,11 +151,11 @@ Response: {
   "extensions": {
     "usage": {
       "nodes": 4,
-      "output_nodes": 20,
+      "output_nodes": 80,
       "depth": 4,
       "variables": 0,
       "fragments": 0,
-      "query_payload": 178
+      "query_payload": 176
     }
   }
 }
@@ -28,14 +163,263 @@ Response: {
 task 2 'run-graphql'. lines 18-32:
 Response: {
   "data": {
-    "checkpointConnection": {
-      "checkpoints": [
+    "checkpoints": {
+      "nodes": [
         {
           "transactionBlockConnection": {
             "edges": [
               {
                 "txns": {
-                  "digest": "B1KYYSB4zrvbhMKvyHFgFhXcEECE72N7nvqrsJfNLX1z"
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "transactionBlockConnection": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
                 }
               }
             ]
@@ -47,11 +431,11 @@ Response: {
   "extensions": {
     "usage": {
       "nodes": 6,
-      "output_nodes": 420,
+      "output_nodes": 1640,
       "depth": 6,
       "variables": 0,
       "fragments": 0,
-      "query_payload": 237
+      "query_payload": 219
     }
   }
 }
@@ -59,14 +443,16 @@ Response: {
 task 3 'run-graphql'. lines 34-55:
 Response: {
   "data": {
-    "checkpointConnection": {
-      "checkpoints": [
+    "checkpoints": {
+      "nodes": [
         {
           "notOne": {
             "edges": [
               {
                 "txns": {
-                  "digest": "B1KYYSB4zrvbhMKvyHFgFhXcEECE72N7nvqrsJfNLX1z"
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
                 }
               }
             ]
@@ -75,7 +461,465 @@ Response: {
             "edges": [
               {
                 "txns": {
-                  "digest": "B1KYYSB4zrvbhMKvyHFgFhXcEECE72N7nvqrsJfNLX1z"
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "notOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isOne": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
                 }
               }
             ]
@@ -87,11 +931,11 @@ Response: {
   "extensions": {
     "usage": {
       "nodes": 10,
-      "output_nodes": 440,
+      "output_nodes": 1720,
       "depth": 6,
       "variables": 0,
       "fragments": 0,
-      "query_payload": 346
+      "query_payload": 332
     }
   }
 }
@@ -99,14 +943,320 @@ Response: {
 task 4 'run-graphql'. lines 57-78:
 Response: {
   "data": {
-    "checkpointConnection": {
-      "checkpoints": [
+    "checkpoints": {
+      "nodes": [
         {
           "notZero": {
             "edges": [
               {
                 "txns": {
-                  "digest": "B1KYYSB4zrvbhMKvyHFgFhXcEECE72N7nvqrsJfNLX1z"
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
+                }
+              }
+            ]
+          },
+          "isZero": {
+            "edges": []
+          }
+        },
+        {
+          "notZero": {
+            "edges": [
+              {
+                "txns": {
+                  "signatures": [
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+                  ]
                 }
               }
             ]
@@ -121,11 +1271,11 @@ Response: {
   "extensions": {
     "usage": {
       "nodes": 10,
-      "output_nodes": 420,
+      "output_nodes": 1640,
       "depth": 6,
       "variables": 0,
       "fragments": 0,
-      "query_payload": 348
+      "query_payload": 334
     }
   }
 }
@@ -137,7 +1287,9 @@ Response: {
       "edges": [
         {
           "txns": {
-            "digest": "B1KYYSB4zrvbhMKvyHFgFhXcEECE72N7nvqrsJfNLX1z"
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ]
           }
         }
       ]
@@ -146,11 +1298,11 @@ Response: {
   "extensions": {
     "usage": {
       "nodes": 4,
-      "output_nodes": 1,
+      "output_nodes": 4,
       "depth": 4,
       "variables": 0,
       "fragments": 0,
-      "query_payload": 154
+      "query_payload": 158
     }
   }
 }
@@ -162,7 +1314,9 @@ Response: {
       "edges": [
         {
           "txns": {
-            "digest": "B1KYYSB4zrvbhMKvyHFgFhXcEECE72N7nvqrsJfNLX1z"
+            "signatures": [
+              "AAsFGDUyGFpFxOglY6q+2tc3oSxHSclrYVPpSGHnresLTpDk6db3s0Jxs7NknfchJjy8OJLPNtahVgmCmiOImgkzJ/Z6H2EPZ3ahjNaglIwSJ0jmtVs2Q0bwZHXm6ELvUg=="
+            ]
           }
         }
       ]
@@ -171,11 +1325,11 @@ Response: {
   "extensions": {
     "usage": {
       "nodes": 4,
-      "output_nodes": 1,
+      "output_nodes": 4,
       "depth": 4,
       "variables": 0,
       "fragments": 0,
-      "query_payload": 152
+      "query_payload": 156
     }
   }
 }
@@ -187,7 +1341,180 @@ Response: {
       "edges": [
         {
           "txns": {
-            "digest": "B1KYYSB4zrvbhMKvyHFgFhXcEECE72N7nvqrsJfNLX1z",
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "first": null,
+            "last": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
             "first": null,
             "last": null
           }
@@ -198,22 +1525,157 @@ Response: {
   "extensions": {
     "usage": {
       "nodes": 14,
-      "output_nodes": 820,
+      "output_nodes": 3320,
       "depth": 8,
       "variables": 0,
       "fragments": 0,
-      "query_payload": 589
+      "query_payload": 514
     }
   }
 }
 
-task 8 'run-graphql'. lines 134-161:
+task 8 'run-graphql'. lines 134-160:
 Response: {
   "data": {
     "transactionBlockConnection": {
       "nodes": [
         {
-          "digest": "B1KYYSB4zrvbhMKvyHFgFhXcEECE72N7nvqrsJfNLX1z",
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
+          "first": null,
+          "last": null
+        },
+        {
+          "signatures": [
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+          ],
           "first": null,
           "last": null
         }
@@ -223,7 +1685,7 @@ Response: {
   "extensions": {
     "usage": {
       "nodes": 13,
-      "output_nodes": 820,
+      "output_nodes": 3300,
       "depth": 7,
       "variables": 0,
       "fragments": 0,
@@ -232,14 +1694,457 @@ Response: {
   }
 }
 
-task 9 'run-graphql'. lines 163-212:
+task 9 'run-graphql'. lines 162-211:
 Response: {
   "data": {
     "transactionBlockConnection": {
       "edges": [
         {
           "txns": {
-            "digest": "B1KYYSB4zrvbhMKvyHFgFhXcEECE72N7nvqrsJfNLX1z",
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null,
+            "b": null
+          }
+        },
+        {
+          "txns": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
             "a": null,
             "b": null
           }
@@ -247,51 +2152,263 @@ Response: {
       ]
     },
     "eventConnection": {
-      "edges": []
+      "edges": [
+        {
+          "node": {
+            "timestamp": "2023-12-29T22:06:00.075Z"
+          }
+        },
+        {
+          "node": {
+            "timestamp": "2023-12-29T22:06:00.075Z"
+          }
+        },
+        {
+          "node": {
+            "timestamp": "2023-12-29T22:06:00.075Z"
+          }
+        },
+        {
+          "node": {
+            "timestamp": "2023-12-29T22:06:00.075Z"
+          }
+        },
+        {
+          "node": {
+            "timestamp": "2023-12-29T22:06:00.075Z"
+          }
+        },
+        {
+          "node": {
+            "timestamp": "2023-12-29T22:06:00.075Z"
+          }
+        },
+        {
+          "node": {
+            "timestamp": "2023-12-29T22:06:00.075Z"
+          }
+        },
+        {
+          "node": {
+            "timestamp": "2023-12-29T22:06:00.075Z"
+          }
+        },
+        {
+          "node": {
+            "timestamp": "2023-12-29T22:06:00.075Z"
+          }
+        },
+        {
+          "node": {
+            "timestamp": "2023-12-29T22:06:00.075Z"
+          }
+        }
+      ]
     }
   },
   "extensions": {
     "usage": {
       "nodes": 24,
-      "output_nodes": 22060,
+      "output_nodes": 86340,
       "depth": 11,
       "variables": 0,
       "fragments": 0,
-      "query_payload": 1261
+      "query_payload": 1443
     }
   }
 }
 
-task 10 'run-graphql'. lines 214-239:
+task 10 'run-graphql'. lines 213-238:
 Response: {
-  "data": null,
-  "errors": [
-    {
-      "message": "Unable to determine output nodes for current node",
-      "locations": [
+  "data": {
+    "transactionBlockConnection": {
+      "edges": [
         {
-          "line": 3,
-          "column": 3
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
+        },
+        {
+          "node": {
+            "signatures": [
+              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+            ],
+            "a": null
+          }
         }
-      ],
-      "extensions": {
-        "code": "BAD_USER_INPUT"
-      }
+      ]
     }
-  ]
+  },
+  "extensions": {
+    "usage": {
+      "nodes": 12,
+      "output_nodes": 33300,
+      "depth": 11,
+      "variables": 0,
+      "fragments": 0,
+      "query_payload": 730
+    }
+  }
 }
 
-task 11 'run-graphql'. lines 241-251:
+task 11 'run-graphql'. lines 240-250:
 Response: {
   "data": null,
   "extensions": {
     "usage": {
       "nodes": 4,
-      "output_nodes": 20,
+      "output_nodes": 80,
       "depth": 4,
       "variables": 0,
       "fragments": 0,
-      "query_payload": 169
+      "query_payload": 167
     }
   },
   "errors": [
@@ -309,6 +2426,32 @@ Response: {
       "extensions": {
         "code": "BAD_USER_INPUT"
       }
+    }
+  ]
+}
+
+task 12 'run-graphql'. lines 252-262:
+Response: {
+  "data": null,
+  "extensions": {
+    "usage": {
+      "nodes": 4,
+      "output_nodes": 80,
+      "depth": 4,
+      "variables": 0,
+      "fragments": 0,
+      "query_payload": 160
+    }
+  },
+  "errors": [
+    {
+      "message": "Invalid value for argument \"first\", expected type \"Int\"",
+      "locations": [
+        {
+          "line": 3,
+          "column": 30
+        }
+      ]
     }
   ]
 }
