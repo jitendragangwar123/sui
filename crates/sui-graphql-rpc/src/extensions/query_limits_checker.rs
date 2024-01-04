@@ -111,7 +111,7 @@ impl Extension for QueryLimitsChecker {
             resp.extension(
                 "usage",
                 value! ({
-                    "nodes": validation_result.num_nodes,
+                    "input_nodes": validation_result.num_nodes,
                     "output_nodes": validation_result.output_nodes,
                     "depth": validation_result.depth,
                     "variables": validation_result.num_variables,

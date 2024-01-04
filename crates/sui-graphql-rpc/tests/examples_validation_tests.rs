@@ -1,7 +1,7 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-// #[cfg(feature = "pg_integration")]
+#[cfg(feature = "pg_integration")]
 mod tests {
     use rand::rngs::StdRng;
     use rand::SeedableRng;
@@ -74,7 +74,7 @@ mod tests {
                     .expect("Usage fetch should succeed")
                     .unwrap_or_else(|| panic!("Usage should be present for query: {}", query.name));
 
-                let nodes = *usage.get("nodes").unwrap_or_else(|| {
+                let nodes = *usage.get("input_nodes").unwrap_or_else(|| {
                     panic!("Node usage should be present for query: {}", query.name)
                 });
                 let output_nodes = *usage.get("output_nodes").unwrap_or_else(|| {
