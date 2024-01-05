@@ -195,12 +195,13 @@ impl ReadApi {
         Ok(checkpoints)
     }
 
+    #[instrument(skip(self))]
     async fn multi_get_transaction_blocks_internal(
         &self,
         digests: Vec<TransactionDigest>,
         opts: Option<SuiTransactionBlockResponseOptions>,
     ) -> Result<Vec<SuiTransactionBlockResponse>, Error> {
-        trace!(digests=?digests, "options: {:?}", opts);
+        trace!("start");
 
         let num_digests = digests.len();
         if num_digests > *QUERY_MAX_RESULT_LIMIT {
@@ -226,7 +227,7 @@ impl ReadApi {
         }
 
         if opts.require_input() {
-            debug!(digests=?digests, "require_input");
+            trace!("require_input");
             let digests_clone = digests.clone();
             let transactions =
                 self.transaction_kv_store.multi_get_tx(&digests_clone).await.tap_err(
@@ -242,7 +243,7 @@ impl ReadApi {
 
         // Fetch effects when `show_events` is true because events relies on effects
         if opts.require_effects() {
-            debug!(digests=?digests, "require_effects");
+            trace!("require_effects");
             let digests_clone = digests.clone();
             let effects_list = self.transaction_kv_store
                 .multi_get_fx_by_tx_digest(&digests_clone)
@@ -257,7 +258,7 @@ impl ReadApi {
             }
         }
 
-        debug!(digests=?digests, "getting checkpoint sequence numbers");
+        trace!("getting checkpoint sequence numbers");
         let checkpoint_seq_list = self
             .transaction_kv_store
             .multi_get_transaction_checkpoint(&digests)
@@ -280,7 +281,7 @@ impl ReadApi {
             .collect::<Vec<CheckpointSequenceNumber>>();
 
         // fetch timestamp from the DB
-        debug!(digests=?digests, "getting checkpoint summaries");
+        trace!("getting checkpoint summaries");
         let timestamps = self
             .transaction_kv_store
             .multi_get_checkpoints_summaries(&unique_checkpoint_numbers)
@@ -315,7 +316,7 @@ impl ReadApi {
         }
 
         if opts.show_events {
-            debug!(digests=?digests, "show_events");
+            trace!("show_events");
 
             let event_digests_list = temp_response
                 .values()
@@ -378,7 +379,7 @@ impl ReadApi {
         let object_cache =
             ObjectProviderCache::new((self.state.clone(), self.transaction_kv_store.clone()));
         if opts.show_balance_changes {
-            debug!(digests=?digests, "show_balance_changes");
+            trace!("show_balance_changes");
 
             let mut results = vec![];
             for resp in temp_response.values() {
@@ -417,7 +418,7 @@ impl ReadApi {
         }
 
         if opts.show_object_changes {
-            debug!(digests=?digests, "show_object_changes");
+            trace!("show_object_changes");
 
             let mut results = vec![];
             for resp in temp_response.values() {
